@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Bike Racing Game</title>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -15,10 +15,19 @@
 
     <div id="road">
 
-      <div id="bike">
-        🏍️
-      </div>
+      <div class="lane-line line1"></div>
+      <div class="lane-line line2"></div>
 
+      <div id="bike">🏍️</div>
+
+      <div id="obstacle">🚗</div>
+
+    </div>
+
+    <div id="gameOver">
+      <h1>GAME OVER</h1>
+      <p id="finalScore">Score: 0</p>
+      <button id="restart">RESTART</button>
     </div>
 
     <div class="controls">
@@ -29,6 +38,5 @@
   </div>
 
   <script src="script.js"></script>
-
 </body>
 </html>
