@@ -2,74 +2,99 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Street Bike Racing</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Street Bike Racing 3D</title>
   <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
 <div id="game">
 
+  <div id="sky">
+    <div class="mountain mountain1"></div>
+    <div class="mountain mountain2"></div>
+  </div>
+
   <div id="hud">
-    <div>🏆 <span id="score">0</span></div>
-    <div>❤️ <span id="lives">3</span></div>
-    <div>BEST <span id="best">0</span></div>
+    <span>🏆 <b id="score">0</b></span>
+    <span>❤️ <b id="lives">3</b></span>
+    <span>🪙 <b id="coins">0</b></span>
+    <span>BEST <b id="best">0</b></span>
   </div>
 
   <div id="road">
 
-    <div class="road-line line-a"></div>
-    <div class="road-line line-b"></div>
+    <div class="roadLine line1"></div>
+    <div class="roadLine line2"></div>
 
-    <div class="tree tree1">🌳</div>
-    <div class="tree tree2">🌳</div>
-    <div class="tree tree3">🌲</div>
-    <div class="tree tree4">🌳</div>
+    <div class="tree t1">🌳</div>
+    <div class="tree t2">🌲</div>
+    <div class="tree t3">🌳</div>
+    <div class="tree t4">🌲</div>
+    <div class="tree t5">🌳</div>
+    <div class="tree t6">🌲</div>
 
-    <div id="enemy1" class="car red">
-      <div class="window"></div>
-      <div class="light l"></div>
-      <div class="light r"></div>
+    <div id="coin1" class="coin">🪙</div>
+    <div id="coin2" class="coin">🪙</div>
+
+    <div id="car1" class="car red">
+      <div class="carWindow"></div>
+      <div class="headlight leftLight"></div>
+      <div class="headlight rightLight"></div>
     </div>
 
-    <div id="enemy2" class="car blue">
-      <div class="window"></div>
-      <div class="light l"></div>
-      <div class="light r"></div>
+    <div id="car2" class="car blue">
+      <div class="carWindow"></div>
+      <div class="headlight leftLight"></div>
+      <div class="headlight rightLight"></div>
+    </div>
+
+    <div id="car3" class="car yellow">
+      <div class="carWindow"></div>
+      <div class="headlight leftLight"></div>
+      <div class="headlight rightLight"></div>
     </div>
 
     <div id="bike">
-      <div class="bike-wheel wheel1"></div>
-      <div class="bike-wheel wheel2"></div>
-      <div class="bike-seat"></div>
-      <div class="bike-engine"></div>
-      <div class="bike-handle"></div>
-      <div class="bike-rider"></div>
-      <div class="bike-head"></div>
+
+      <div class="wheel frontWheel"></div>
+      <div class="wheel backWheel"></div>
+
+      <div class="handle"></div>
+      <div class="seat"></div>
+      <div class="bodyBike"></div>
+      <div class="engine"></div>
+
+      <div class="rider"></div>
+      <div class="helmet"></div>
+
+      <div id="nitroFire"></div>
+
     </div>
 
   </div>
 
-  <div id="speed">
-    SPEED <span id="speedValue">1</span>
+  <div id="speedBox">
+    ⚡ SPEED <b id="speed">1</b>
   </div>
 
+  <button id="nitro">🔥 NITRO</button>
+
   <div id="controls">
-    <button id="left">◀</button>
-    <button id="right">▶</button>
+    <button id="left">⬅</button>
+    <button id="right">➡</button>
   </div>
 
   <div id="gameOver">
-    <h1>CRASH!</h1>
+    <h1>💥 CRASH!</h1>
     <p>Score: <b id="finalScore">0</b></p>
+    <p>Coins: <b id="finalCoins">0</b></p>
     <p>Best: <b id="finalBest">0</b></p>
-    <button id="restart">RACE AGAIN</button>
+    <button id="restart">🏍️ RACE AGAIN</button>
   </div>
 
 </div>
 
 <script src="script.js"></script>
 </body>
-</html>
+  </html>
