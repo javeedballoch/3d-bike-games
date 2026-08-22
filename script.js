@@ -6,16 +6,17 @@ const cars = [
   document.getElementById("car3")
 ];
 
-const coins = [
-  document.getElementById("coin1"),
-  document.getElementById("coin2")
+const coinElements = [
+  document.querySelector(".coin1"),
+  document.querySelector(".coin2"),
+  document.querySelector(".coin3")
 ];
 
-const scoreText = document.getElementById("score");
-const livesText = document.getElementById("lives");
-const coinsText = document.getElementById("coins");
-const bestText = document.getElementById("best");
-const speedText = document.getElementById("speed");
+const scoreElement = document.getElementById("score");
+const livesElement = document.getElementById("lives");
+const coinsElement = document.getElementById("coins");
+const bestElement = document.getElementById("best");
+const speedElement = document.getElementById("speedValue");
 
 const leftButton = document.getElementById("left");
 const rightButton = document.getElementById("right");
@@ -30,35 +31,37 @@ const restartButton = document.getElementById("restart");
 let lane = 1;
 
 let score = 0;
-let coinScore = 0;
 let lives = 3;
+let coinCount = 0;
 
-let speed = 5;
-let nitro = false;
+let speed = 4;
 
 let running = true;
+let nitroActive = false;
 
-let best = Number(localStorage.getItem("bikeBest")) || 0;
+let best =
+  Number(localStorage.getItem("streetBikeBest")) || 0;
 
-bestText.textContent = best;
+bestElement.textContent = best;
 
 
-/* Lane positions */
+/* LANE */
 
-function lanePosition(n) {
+function laneX(number) {
 
-  if (n === 0) return 16.66;
-  if (n === 1) return 50;
+  if (number === 0) return 16.66;
+  if (number === 1) return 50;
   return 83.33;
 
 }
 
 
-/* Bike */
+/* BIKE */
 
 function updateBike() {
 
-  bike.style.left = lanePosition(lane) + "%";
+  bike.style.left =
+    laneX(lane) + "%";
 
 }
 
@@ -87,154 +90,223 @@ function moveRight() {
 }
 
 
-/* Buttons */
+/* BUTTONS */
 
-leftButton.addEventListener("click", moveLeft);
-rightButton.addEventListener("click", moveRight);
+leftButton.addEventListener(
+  "touchstart",
+  function(e) {
+    e.preventDefault();
+    moveLeft();
+  }
+);
+
+rightButton.addEventListener(
+  "touchstart",
+  function(e) {
+    e.preventDefault();
+    moveRight();
+  }
+);
+
+leftButton.addEventListener(
+  "click",
+  moveLeft
+);
+
+rightButton.addEventListener(
+  "click",
+  moveRight
+);
 
 
-/* Keyboard */
+/* KEYBOARD */
 
-document.addEventListener("keydown", function(e) {
+document.addEventListener(
+  "keydown",
+  function(e) {
 
-  if (e.key === "ArrowLeft") moveLeft();
-
-  if (e.key === "ArrowRight") moveRight();
-
-});
-
-
-/* Swipe */
-
-let startX = 0;
-
-document.addEventListener("touchstart", function(e) {
-
-  startX = e.touches[0].clientX;
-
-}, { passive: true });
-
-
-document.addEventListener("touchend", function(e) {
-
-  const endX = e.changedTouches[0].clientX;
-
-  const distance = endX - startX;
-
-  if (Math.abs(distance) > 40) {
-
-    if (distance < 0) {
+    if (e.key === "ArrowLeft") {
       moveLeft();
-    } else {
+    }
+
+    if (e.key === "ArrowRight") {
       moveRight();
     }
 
   }
+);
 
-}, { passive: true });
+
+/* SWIPE */
+
+let touchStartX = 0;
+
+document.addEventListener(
+  "touchstart",
+  function(e) {
+
+    touchStartX =
+      e.touches[0].clientX;
+
+  },
+  { passive: true }
+);
 
 
-/* Random lane */
+document.addEventListener(
+  "touchend",
+  function(e) {
+
+    const endX =
+      e.changedTouches[0].clientX;
+
+    const difference =
+      endX - touchStartX;
+
+    if (Math.abs(difference) < 40) {
+      return;
+    }
+
+    if (difference > 0) {
+      moveRight();
+    } else {
+      moveLeft();
+    }
+
+  },
+  { passive: true }
+);
+
+
+/* OBJECT DATA */
+
+let carData = cars.map(
+  function(car, index) {
+
+    return {
+      element: car,
+      lane: index,
+      y: -250 - index * 280
+    };
+
+  }
+);
+
+
+let coinData = coinElements.map(
+  function(coin, index) {
+
+    return {
+      element: coin,
+      lane: index,
+      y: -400 - index * 350
+    };
+
+  }
+);
+
+
+/* RANDOM LANE */
 
 function randomLane() {
 
-  return Math.floor(Math.random() * 3);
-
-}
-
-
-/* Car positions */
-
-let carData = cars.map((car, index) => ({
-  element: car,
-  lane: index % 3,
-  y: -200 - index * 250
-}));
-
-
-function resetCar(data, extraDistance = 0) {
-
-  data.lane = randomLane();
-
-  data.y = -150 - Math.random() * 300 - extraDistance;
-
-  data.element.style.left =
-    lanePosition(data.lane) + "%";
-
-  data.element.style.top =
-    data.y + "px";
-
-}
-
-
-/* Coins */
-
-let coinData = coins.map((coin, index) => ({
-  element: coin,
-  lane: index === 0 ? 0 : 2,
-  y: -300 - index * 500
-}));
-
-
-function resetCoin(data) {
-
-  data.lane = randomLane();
-
-  data.y = -200 - Math.random() * 500;
-
-  data.element.style.left =
-    lanePosition(data.lane) + "%";
-
-  data.element.style.top =
-    data.y + "px";
-
-}
-
-
-/* Collision */
-
-function collision(a, b) {
-
-  const A = a.getBoundingClientRect();
-  const B = b.getBoundingClientRect();
-
-  const padding = 9;
-
-  return (
-    A.left + padding < B.right - padding &&
-    A.right - padding > B.left + padding &&
-    A.top + padding < B.bottom - padding &&
-    A.bottom - padding > B.top + padding
+  return Math.floor(
+    Math.random() * 3
   );
 
 }
 
 
-/* Car crash */
+/* RESET CAR */
+
+function resetCar(data) {
+
+  data.lane =
+    randomLane();
+
+  data.y =
+    -180 -
+    Math.random() * 500;
+
+  data.element.style.left =
+    laneX(data.lane) + "%";
+
+  data.element.style.top =
+    data.y + "px";
+
+}
+
+
+/* RESET COIN */
+
+function resetCoin(data) {
+
+  data.lane =
+    randomLane();
+
+  data.y =
+    -250 -
+    Math.random() * 650;
+
+  data.element.style.left =
+    laneX(data.lane) + "%";
+
+  data.element.style.top =
+    data.y + "px";
+
+}
+
+
+/* COLLISION */
+
+function collision(a, b) {
+
+  const A =
+    a.getBoundingClientRect();
+
+  const B =
+    b.getBoundingClientRect();
+
+  return (
+    A.left + 12 < B.right - 12 &&
+    A.right - 12 > B.left + 12 &&
+    A.top + 12 < B.bottom - 12 &&
+    A.bottom - 12 > B.top + 12
+  );
+
+}
+
+
+/* CRASH */
 
 function crash(data) {
 
   lives--;
 
-  livesText.textContent = lives;
+  livesElement.textContent =
+    lives;
 
-  data.y = -200;
+  data.y = -250;
 
-  data.element.style.top = "-200px";
+  data.element.style.top =
+    "-250px";
 
   bike.style.transform =
-    "translateX(-50%) rotate(10deg)";
+    "translateX(-50%) rotate(12deg)";
 
   if (navigator.vibrate) {
-    navigator.vibrate(300);
+    navigator.vibrate(250);
   }
 
-  setTimeout(() => {
+  setTimeout(
+    function() {
 
-    bike.style.transform =
-      "translateX(-50%) rotate(0deg)";
+      bike.style.transform =
+        "translateX(-50%) rotate(0deg)";
 
-  }, 250);
+    },
+    250
+  );
 
   if (lives <= 0) {
     endGame();
@@ -243,153 +315,191 @@ function crash(data) {
 }
 
 
-/* Coin collection */
+/* COIN */
 
 function collectCoin(data) {
 
-  coinScore++;
-
-  coinsText.textContent = coinScore;
+  coinCount++;
 
   score += 5;
 
-  data.y = -300;
+  coinsElement.textContent =
+    coinCount;
 
-  data.element.style.top = "-300px";
+  resetCoin(data);
 
   if (navigator.vibrate) {
-    navigator.vibrate(80);
+    navigator.vibrate(70);
   }
 
 }
 
 
-/* Nitro */
+/* NITRO */
 
-let nitroTimer = null;
+let nitroTimer;
 
-nitroButton.addEventListener("click", function() {
+nitroButton.addEventListener(
+  "click",
+  function() {
 
-  if (!running || nitro) return;
+    if (!running || nitroActive) {
+      return;
+    }
 
-  nitro = true;
+    nitroActive = true;
 
-  bike.classList.add("nitro");
+    bike.classList.add("nitro");
 
-  speed += 8;
+    speed += 7;
 
-  clearTimeout(nitroTimer);
+    clearTimeout(nitroTimer);
 
-  nitroTimer = setTimeout(function() {
+    nitroTimer =
+      setTimeout(
+        function() {
 
-    speed -= 8;
+          speed -= 7;
 
-    nitro = false;
+          nitroActive = false;
 
-    bike.classList.remove("nitro");
+          bike.classList.remove(
+            "nitro"
+          );
 
-  }, 3000);
+        },
+        3000
+      );
 
-});
+  }
+);
 
 
-/* Main game */
+/* GAME LOOP */
 
 function gameLoop() {
 
-  if (!running) return;
-
-  const currentSpeed = speed;
+  if (!running) {
+    return;
+  }
 
   /* Cars */
 
-  carData.forEach(function(data) {
+  carData.forEach(
+    function(data) {
 
-    data.y += currentSpeed;
+      data.y += speed;
 
-    data.element.style.top =
-      data.y + "px";
+      data.element.style.top =
+        data.y + "px";
 
-    if (data.y > window.innerHeight) {
+      if (
+        data.y >
+        window.innerHeight + 100
+      ) {
 
-      score++;
+        score++;
 
-      resetCar(data);
+        resetCar(data);
+
+      }
+
+      if (
+        collision(
+          bike,
+          data.element
+        )
+      ) {
+
+        crash(data);
+
+        resetCar(data);
+
+      }
 
     }
-
-    if (collision(bike, data.element)) {
-
-      crash(data);
-
-      resetCar(data);
-
-    }
-
-  });
+  );
 
 
   /* Coins */
 
-  coinData.forEach(function(data) {
+  coinData.forEach(
+    function(data) {
 
-    data.y += currentSpeed;
+      data.y += speed;
 
-    data.element.style.top =
-      data.y + "px";
+      data.element.style.top =
+        data.y + "px";
 
-    if (data.y > window.innerHeight) {
+      if (
+        data.y >
+        window.innerHeight + 100
+      ) {
 
-      resetCoin(data);
+        resetCoin(data);
+
+      }
+
+      if (
+        collision(
+          bike,
+          data.element
+        )
+      ) {
+
+        collectCoin(data);
+
+      }
 
     }
-
-    if (collision(bike, data.element)) {
-
-      collectCoin(data);
-
-    }
-
-  });
+  );
 
 
   /* Difficulty */
 
-  if (!nitro) {
+  if (!nitroActive) {
 
-    speed = Math.min(
-      11,
-      5 + score / 35
-    );
+    speed =
+      Math.min(
+        10,
+        4 + score / 40
+      );
 
   }
 
+  speedElement.textContent =
+    Math.max(
+      1,
+      Math.floor(speed / 2)
+    );
 
-  speedText.textContent =
-    Math.max(1, Math.floor(speed - 3));
-
-
-  scoreText.textContent =
+  scoreElement.textContent =
     score;
 
-
-  requestAnimationFrame(gameLoop);
+  requestAnimationFrame(
+    gameLoop
+  );
 
 }
 
 
-/* Score */
+/* SCORE TIMER */
 
-setInterval(function() {
+setInterval(
+  function() {
 
-  if (!running) return;
+    if (!running) {
+      return;
+    }
 
-  score++;
+    score++;
 
-}, 1000);
+  },
+  1000
+);
 
 
-/* Game over */
+/* GAME OVER */
 
 function endGame() {
 
@@ -400,71 +510,124 @@ function endGame() {
     best = score;
 
     localStorage.setItem(
-      "bikeBest",
+      "streetBikeBest",
       best
     );
 
   }
 
-  finalScore.textContent = score;
-  finalCoins.textContent = coinScore;
-  finalBest.textContent = best;
+  finalScore.textContent =
+    score;
 
-  bestText.textContent = best;
+  finalCoins.textContent =
+    coinCount;
 
-  gameOver.style.display = "block";
+  finalBest.textContent =
+    best;
+
+  bestElement.textContent =
+    best;
+
+  gameOver.style.display =
+    "block";
 
 }
 
 
-/* Restart */
+/* RESTART */
 
-restartButton.addEventListener("click", function() {
+restartButton.addEventListener(
+  "click",
+  function() {
 
-  score = 0;
-  coinScore = 0;
-  lives = 3;
+    score = 0;
+    lives = 3;
+    coinCount = 0;
 
-  speed = 5;
-  nitro = false;
+    speed = 4;
 
-  lane = 1;
-  running = true;
+    lane = 1;
 
-  scoreText.textContent = "0";
-  coinsText.textContent = "0";
-  livesText.textContent = "3";
-  speedText.textContent = "1";
+    running = true;
+    nitroActive = false;
 
-  gameOver.style.display = "none";
+    scoreElement.textContent =
+      "0";
 
-  bike.classList.remove("nitro");
+    livesElement.textContent =
+      "3";
 
-  updateBike();
+    coinsElement.textContent =
+      "0";
 
-  carData.forEach(function(data, index) {
-    resetCar(data, index * 180);
-  });
+    speedElement.textContent =
+      "2";
 
-  coinData.forEach(function(data) {
-    resetCoin(data);
-  });
+    gameOver.style.display =
+      "none";
 
-  requestAnimationFrame(gameLoop);
+    bike.classList.remove(
+      "nitro"
+    );
 
-});
+    updateBike();
+
+    carData.forEach(
+      function(data, index) {
+
+        data.y =
+          -200 -
+          index * 350;
+
+        resetCar(data);
+
+      }
+    );
+
+    coinData.forEach(
+      function(data) {
+
+        resetCoin(data);
+
+      }
+    );
+
+    requestAnimationFrame(
+      gameLoop
+    );
+
+  }
+);
 
 
-/* Start */
+/* START */
 
 updateBike();
 
-carData.forEach(function(data, index) {
-  resetCar(data, index * 180);
-});
+carData.forEach(
+  function(data, index) {
 
-coinData.forEach(function(data) {
-  resetCoin(data);
-});
+    data.y =
+      -250 -
+      index * 300;
 
-requestAnimationFrame(gameLoop);
+    resetCar(data);
+
+  }
+);
+
+coinData.forEach(
+  function(data, index) {
+
+    data.y =
+      -350 -
+      index * 400;
+
+    resetCoin(data);
+
+  }
+);
+
+requestAnimationFrame(
+  gameLoop
+);
