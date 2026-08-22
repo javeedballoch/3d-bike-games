@@ -1,184 +1,222 @@
 const bike = document.getElementById("bike");
-const obstacle = document.getElementById("obstacle");
+const enemy = document.getElementById("enemy");
+const enemy2 = document.getElementById("enemy2");
+
 const scoreText = document.getElementById("score");
+const livesText = document.getElementById("lives");
+const highScoreText = document.getElementById("highScore");
 
 const leftButton = document.getElementById("left");
 const rightButton = document.getElementById("right");
 
-const gameOverScreen = document.getElementById("gameOver");
+const gameOver = document.getElementById("gameOver");
 const finalScore = document.getElementById("finalScore");
 const restartButton = document.getElementById("restart");
 
-
-// -------------------------
-// Game variables
-// -------------------------
-
-let lane = 1; // 0 = left, 1 = center, 2 = right
+let lane = 1;
 
 let score = 0;
-
-let obstacleLane = 1;
-
-let obstacleY = -100;
+let lives = 3;
 
 let speed = 5;
 
-let gameRunning = true;
+let running = true;
+
+let enemyY = -120;
+let enemy2Y = -500;
+
+let enemyLane = 0;
+let enemy2Lane = 2;
+
+let highScore = Number(localStorage.getItem("bikeHighScore")) || 0;
+
+highScoreText.textContent = highScore;
 
 
-// -------------------------
-// Get lane position
-// -------------------------
+/* -----------------------
+   Lane positions
+----------------------- */
 
-function getLanePosition(laneNumber) {
+function lanePosition(n) {
 
-  if (laneNumber === 0) {
-    return 16.66;
-  }
-
-  if (laneNumber === 1) {
-    return 50;
-  }
-
+  if (n === 0) return 16.66;
+  if (n === 1) return 50;
   return 83.33;
+
 }
 
 
-// -------------------------
-// Move bike
-// -------------------------
+/* -----------------------
+   Update bike
+----------------------- */
 
 function updateBike() {
 
-  bike.style.left = getLanePosition(lane) + "%";
+  bike.style.left = lanePosition(lane) + "%";
 
 }
 
 
-// -------------------------
-// Left movement
-// -------------------------
+/* -----------------------
+   Move left
+----------------------- */
 
 function moveLeft() {
 
-  if (!gameRunning) return;
+  if (!running) return;
 
   if (lane > 0) {
-
     lane--;
-
     updateBike();
-
   }
 
 }
 
 
-// -------------------------
-// Right movement
-// -------------------------
+/* -----------------------
+   Move right
+----------------------- */
 
 function moveRight() {
 
-  if (!gameRunning) return;
+  if (!running) return;
 
   if (lane < 2) {
-
     lane++;
-
     updateBike();
-
   }
 
 }
 
 
-// -------------------------
-// Buttons
-// -------------------------
+/* -----------------------
+   Buttons
+----------------------- */
 
 leftButton.addEventListener("click", moveLeft);
-
 rightButton.addEventListener("click", moveRight);
 
 
-// -------------------------
-// Touch controls
-// -------------------------
-
-leftButton.addEventListener("touchstart", function(e) {
-
-  e.preventDefault();
-
-  moveLeft();
-
-});
-
-
-rightButton.addEventListener("touchstart", function(e) {
-
-  e.preventDefault();
-
-  moveRight();
-
-});
-
-
-// -------------------------
-// Keyboard controls
-// -------------------------
+/* -----------------------
+   Keyboard
+----------------------- */
 
 document.addEventListener("keydown", function(e) {
 
   if (e.key === "ArrowLeft") {
-
     moveLeft();
-
   }
 
   if (e.key === "ArrowRight") {
-
     moveRight();
-
   }
 
 });
 
 
-// -------------------------
-// Create obstacle
-// -------------------------
+/* -----------------------
+   Touch swipe
+----------------------- */
 
-function resetObstacle() {
+let touchStartX = 0;
 
-  obstacleLane = Math.floor(Math.random() * 3);
+document.addEventListener("touchstart", function(e) {
 
-  obstacleY = -100;
+  touchStartX = e.touches[0].clientX;
 
-  obstacle.style.left =
-    getLanePosition(obstacleLane) + "%";
+}, {passive:true});
+
+
+document.addEventListener("touchend", function(e) {
+
+  const touchEndX = e.changedTouches[0].clientX;
+
+  const difference = touchEndX - touchStartX;
+
+  if (Math.abs(difference) > 40) {
+
+    if (difference < 0) {
+      moveLeft();
+    } else {
+      moveRight();
+    }
+
+  }
+
+}, {passive:true});
+
+
+/* -----------------------
+   Random lane
+----------------------- */
+
+function randomLane() {
+
+  return Math.floor(Math.random() * 3);
 
 }
 
 
-// -------------------------
-// Collision detection
-// -------------------------
+/* -----------------------
+   Reset enemy
+----------------------- */
 
-function checkCollision() {
+function resetEnemy() {
 
-  const bikeRect = bike.getBoundingClientRect();
+  enemyLane = randomLane();
 
-  const obstacleRect = obstacle.getBoundingClientRect();
+  enemyY = -120;
 
-  const collision =
-    bikeRect.left < obstacleRect.right &&
-    bikeRect.right > obstacleRect.left &&
-    bikeRect.top < obstacleRect.bottom &&
-    bikeRect.bottom > obstacleRect.top;
+  enemy.style.left =
+    lanePosition(enemyLane) + "%";
 
-  if (collision) {
+}
+
+
+function resetEnemy2() {
+
+  enemy2Lane = randomLane();
+
+  enemy2Y = -500;
+
+  enemy2.style.left =
+    lanePosition(enemy2Lane) + "%";
+
+}
+
+
+/* -----------------------
+   Collision
+----------------------- */
+
+function collision(object) {
+
+  const a = bike.getBoundingClientRect();
+  const b = object.getBoundingClientRect();
+
+  return (
+    a.left < b.right &&
+    a.right > b.left &&
+    a.top < b.bottom &&
+    a.bottom > b.top
+  );
+
+}
+
+
+/* -----------------------
+   Crash
+----------------------- */
+
+function crash(object) {
+
+  lives--;
+
+  livesText.textContent = lives;
+
+  object.style.top = "-150px";
+
+  if (lives <= 0) {
 
     endGame();
 
@@ -187,111 +225,154 @@ function checkCollision() {
 }
 
 
-// -------------------------
-// Game loop
-// -------------------------
+/* -----------------------
+   Game loop
+----------------------- */
 
 function gameLoop() {
 
-  if (!gameRunning) return;
+  if (!running) return;
 
-  obstacleY += speed;
+  enemyY += speed;
+  enemy2Y += speed * 0.85;
 
-  obstacle.style.top = obstacleY + "px";
+  enemy.style.top = enemyY + "px";
+  enemy2.style.top = enemy2Y + "px";
 
-  checkCollision();
 
-  // Obstacle reached bottom
+  /* Enemy 1 */
 
-  if (obstacleY > window.innerHeight) {
+  if (enemyY > window.innerHeight) {
 
     score++;
 
-    scoreText.textContent =
-      "Score: " + score;
-
-    // Increase speed gradually
-
-    if (score % 5 === 0) {
-
-      speed += 0.5;
-
-    }
-
-    resetObstacle();
+    resetEnemy();
 
   }
+
+
+  /* Enemy 2 */
+
+  if (enemy2Y > window.innerHeight) {
+
+    score++;
+
+    resetEnemy2();
+
+  }
+
+
+  /* Collision */
+
+  if (collision(enemy)) {
+    crash(enemy);
+    resetEnemy();
+  }
+
+  if (collision(enemy2)) {
+    crash(enemy2);
+    resetEnemy2();
+  }
+
+
+  /* Score */
+
+  scoreText.textContent = score;
+
+
+  /* Increase difficulty */
+
+  if (score > 0 && score % 10 === 0) {
+    speed = Math.min(13, 5 + score / 20);
+  }
+
 
   requestAnimationFrame(gameLoop);
 
 }
 
 
-// -------------------------
-// Score
-// -------------------------
+/* -----------------------
+   Score timer
+----------------------- */
 
 setInterval(function() {
 
-  if (!gameRunning) return;
+  if (!running) return;
 
   score++;
 
-  scoreText.textContent =
-    "Score: " + score;
+  scoreText.textContent = score;
 
 }, 1000);
 
 
-// -------------------------
-// Game Over
-// -------------------------
+/* -----------------------
+   End game
+----------------------- */
 
 function endGame() {
 
-  gameRunning = false;
+  running = false;
 
-  finalScore.textContent =
-    "Score: " + score;
+  finalScore.textContent = score;
 
-  gameOverScreen.style.display = "block";
+  if (score > highScore) {
+
+    highScore = score;
+
+    localStorage.setItem(
+      "bikeHighScore",
+      highScore
+    );
+
+    highScoreText.textContent = highScore;
+
+  }
+
+  gameOver.style.display = "block";
 
 }
 
 
-// -------------------------
-// Restart
-// -------------------------
+/* -----------------------
+   Restart
+----------------------- */
 
 restartButton.addEventListener("click", function() {
 
   score = 0;
 
+  lives = 3;
+
   speed = 5;
 
   lane = 1;
 
-  gameRunning = true;
+  running = true;
 
-  scoreText.textContent = "Score: 0";
+  scoreText.textContent = "0";
+  livesText.textContent = "3";
 
-  gameOverScreen.style.display = "none";
+  gameOver.style.display = "none";
 
   updateBike();
 
-  resetObstacle();
+  resetEnemy();
+  resetEnemy2();
 
   requestAnimationFrame(gameLoop);
 
 });
 
 
-// -------------------------
-// Start game
-// -------------------------
+/* -----------------------
+   Start
+----------------------- */
 
 updateBike();
 
-resetObstacle();
+resetEnemy();
+resetEnemy2();
 
 requestAnimationFrame(gameLoop);
