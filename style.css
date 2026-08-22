@@ -1,7 +1,9 @@
 * {
-  box-sizing: border-box;
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 html,
@@ -10,84 +12,178 @@ body {
   height: 100%;
   overflow: hidden;
   font-family: Arial, sans-serif;
-  background: #42b84b;
+  background: #53b84b;
 }
 
 #game {
-  width: 100%;
+  width: 100vw;
   height: 100vh;
   position: relative;
   overflow: hidden;
+  background:
+    linear-gradient(
+      #75c7ff 0%,
+      #a8ddff 28%,
+      #5abb4d 28%,
+      #42a940 100%
+    );
 }
 
-/* Score */
+/* HUD */
 
-#score {
+#hud {
   position: absolute;
-  top: 20px;
-  left: 25px;
-  z-index: 20;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(94vw, 600px);
+
+  display: flex;
+  justify-content: space-between;
 
   color: white;
-  font-size: 38px;
+  font-size: 20px;
   font-weight: bold;
 
-  text-shadow:
-    2px 2px 3px #000,
-    -1px -1px 2px #000;
+  z-index: 100;
+
+  text-shadow: 2px 2px 3px #000;
 }
 
 /* Road */
 
 #road {
   position: absolute;
-
-  width: min(78vw, 560px);
-  height: 100%;
-
   left: 50%;
   transform: translateX(-50%);
 
+  width: min(78vw, 570px);
+  height: 100vh;
+
   background:
     linear-gradient(
-      to right,
-      #333 0%,
-      #444 3%,
-      #444 97%,
-      #333 100%
+      90deg,
+      #252525 0%,
+      #404040 5%,
+      #444 50%,
+      #404040 95%,
+      #252525 100%
     );
 
-  border-left: 7px solid white;
-  border-right: 7px solid white;
+  border-left: 9px solid white;
+  border-right: 9px solid white;
 
   overflow: hidden;
+
+  perspective: 500px;
 }
 
-/* Lane lines */
+/* Road lines */
 
-.lane-line {
+.road-line {
   position: absolute;
 
-  width: 12px;
-  height: 100px;
+  top: -160px;
 
-  background: white;
+  width: 9px;
+  height: 115px;
 
-  left: 33.33%;
+  background: #eee;
 
-  box-shadow: 0 150px white,
-              0 300px white,
-              0 450px white,
-              0 600px white,
-              0 750px white;
+  animation: roadMove .55s linear infinite;
 }
 
-.line1 {
+.line-a {
   left: 33.33%;
 }
 
-.line2 {
+.line-b {
   left: 66.66%;
+}
+
+@keyframes roadMove {
+  0% {
+    transform: translateY(-180px);
+  }
+
+  100% {
+    transform: translateY(110vh);
+  }
+}
+
+/* Road edge */
+
+#road::before,
+#road::after {
+  content: "";
+
+  position: absolute;
+  top: 0;
+
+  width: 7px;
+  height: 100%;
+
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      white 0 28px,
+      #e52222 28px 56px
+    );
+
+  z-index: 10;
+}
+
+#road::before {
+  left: 0;
+}
+
+#road::after {
+  right: 0;
+}
+
+/* Trees */
+
+.tree {
+  position: absolute;
+
+  font-size: 45px;
+
+  z-index: 5;
+
+  animation: treesMove 2.2s linear infinite;
+}
+
+.tree1 {
+  left: -48px;
+  top: 5%;
+}
+
+.tree2 {
+  right: -50px;
+  top: 30%;
+  animation-delay: -.7s;
+}
+
+.tree3 {
+  left: -48px;
+  top: 55%;
+  animation-delay: -1.2s;
+}
+
+.tree4 {
+  right: -50px;
+  top: 80%;
+  animation-delay: -.3s;
+}
+
+@keyframes treesMove {
+  from {
+    transform: translateY(-100px);
+  }
+
+  to {
+    transform: translateY(130px);
+  }
 }
 
 /* Bike */
@@ -95,168 +191,345 @@ body {
 #bike {
   position: absolute;
 
-  bottom: 120px;
+  width: 66px;
+  height: 112px;
 
-  width: 80px;
-  height: 80px;
-
-  font-size: 60px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  bottom: 105px;
+  left: 50%;
 
   transform: translateX(-50%);
 
-  left: 50%;
+  z-index: 30;
 
-  z-index: 10;
-
-  transition: left 0.15s ease;
+  transition: left .14s ease;
 }
 
-/* Obstacle */
+/* Wheels */
 
-#obstacle {
+.bike-wheel {
   position: absolute;
 
-  top: -100px;
+  width: 19px;
+  height: 36px;
 
-  width: 75px;
-  height: 75px;
+  left: 23px;
 
-  font-size: 55px;
+  border-radius: 50%;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background:
+    linear-gradient(
+      90deg,
+      #050505,
+      #555,
+      #050505
+    );
+
+  border: 2px solid #111;
+}
+
+.wheel1 {
+  top: 0;
+}
+
+.wheel2 {
+  bottom: 0;
+}
+
+/* Bike body */
+
+.bike-engine {
+  position: absolute;
+
+  width: 32px;
+  height: 43px;
+
+  left: 17px;
+  top: 36px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #850000,
+      #f52222,
+      #8c0000
+    );
+
+  border-radius: 14px 14px 8px 8px;
+
+  box-shadow: 0 0 5px #000;
+}
+
+.bike-seat {
+  position: absolute;
+
+  width: 27px;
+  height: 11px;
+
+  left: 20px;
+  top: 30px;
+
+  background: #111;
+
+  border-radius: 8px;
+}
+
+.bike-handle {
+  position: absolute;
+
+  width: 38px;
+  height: 5px;
+
+  left: 14px;
+  top: 27px;
+
+  background: #111;
+
+  transform: rotate(-4deg);
+}
+
+.bike-rider {
+  position: absolute;
+
+  width: 25px;
+  height: 30px;
+
+  left: 21px;
+  top: 17px;
+
+  background: #181818;
+
+  border-radius: 50% 50% 35% 35%;
+}
+
+.bike-head {
+  position: absolute;
+
+  width: 18px;
+  height: 18px;
+
+  left: 24px;
+  top: 7px;
+
+  background: #111;
+
+  border-radius: 50%;
+
+  border: 3px solid #777;
+}
+
+/* Enemy cars */
+
+.car {
+  position: absolute;
+
+  width: 60px;
+  height: 88px;
+
+  top: -130px;
 
   transform: translateX(-50%);
 
-  left: 50%;
+  border-radius: 13px;
 
-  z-index: 8;
+  box-shadow:
+    inset 0 0 0 3px #222,
+    0 4px 8px #111;
+
+  z-index: 25;
+}
+
+.red {
+  background:
+    linear-gradient(
+      90deg,
+      #8b0000,
+      #ff2525,
+      #8b0000
+    );
+}
+
+.blue {
+  background:
+    linear-gradient(
+      90deg,
+      #003d88,
+      #0879df,
+      #003d88
+    );
+}
+
+.window {
+  position: absolute;
+
+  width: 40px;
+  height: 27px;
+
+  top: 10px;
+  left: 10px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #c7f4ff,
+      #315f78
+    );
+
+  border-radius: 6px;
+
+  border: 2px solid #111;
+}
+
+.light {
+  position: absolute;
+
+  width: 10px;
+  height: 7px;
+
+  bottom: 8px;
+
+  background: #ffd900;
+
+  border-radius: 3px;
+}
+
+.light.l {
+  left: 8px;
+}
+
+.light.r {
+  right: 8px;
+}
+
+/* Speed */
+
+#speed {
+  position: absolute;
+
+  bottom: 100px;
+  right: 15px;
+
+  color: white;
+
+  font-size: 14px;
+  font-weight: bold;
+
+  z-index: 100;
+
+  text-shadow: 2px 2px 3px #000;
 }
 
 /* Controls */
 
-.controls {
+#controls {
   position: absolute;
 
   bottom: 15px;
-
   left: 50%;
 
   transform: translateX(-50%);
 
-  width: min(78vw, 560px);
+  width: min(78vw, 570px);
 
   display: flex;
-
   justify-content: space-between;
 
   padding: 0 15px;
 
-  z-index: 30;
+  z-index: 100;
 }
 
-.controls button {
-  width: 85px;
-  height: 65px;
+#controls button {
+  width: 82px;
+  height: 62px;
 
   border: none;
-  border-radius: 20px;
 
-  background: rgba(0, 0, 0, 0.75);
+  border-radius: 18px;
+
+  background: rgba(0, 0, 0, .78);
 
   color: white;
 
   font-size: 35px;
 
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+  box-shadow:
+    0 5px 12px rgba(0, 0, 0, .5);
 
   touch-action: manipulation;
 }
 
-.controls button:active {
-  transform: scale(0.9);
-  background: rgba(50, 50, 50, 0.9);
+#controls button:active {
+  transform: scale(.9);
 }
 
-/* Game Over */
+/* Game over */
 
 #gameOver {
-  position: absolute;
-
   display: none;
 
-  z-index: 100;
+  position: absolute;
 
   top: 50%;
   left: 50%;
 
   transform: translate(-50%, -50%);
 
-  width: 85%;
+  width: 86%;
+  max-width: 390px;
 
   padding: 30px;
 
   text-align: center;
 
-  background: rgba(0, 0, 0, 0.9);
+  background: rgba(0, 0, 0, .94);
 
   color: white;
 
-  border-radius: 20px;
+  border-radius: 24px;
+
+  z-index: 200;
 }
 
 #gameOver h1 {
-  font-size: 40px;
+  color: #ff3333;
+
+  font-size: 42px;
+
   margin-bottom: 15px;
 }
 
-#finalScore {
-  font-size: 25px;
-  margin-bottom: 20px;
+#gameOver p {
+  font-size: 22px;
+
+  margin: 8px 0;
 }
 
 #restart {
-  padding: 14px 30px;
+  margin-top: 20px;
+
+  padding: 14px 28px;
 
   border: none;
+
   border-radius: 12px;
 
   background: #00c853;
 
   color: white;
 
-  font-size: 20px;
+  font-size: 18px;
+
   font-weight: bold;
 }
 
-/* Mobile */
+@media(max-width:600px) {
 
-@media (max-width: 600px) {
-
-  #score {
-    font-size: 34px;
-    top: 18px;
-    left: 20px;
+  #hud {
+    font-size: 18px;
   }
 
-  #bike {
-    font-size: 55px;
-    width: 70px;
-    height: 70px;
+  #controls button {
+    width: 76px;
+    height: 58px;
   }
-
-  #obstacle {
-    font-size: 50px;
-  }
-
-  .controls button {
-    width: 80px;
-    height: 60px;
-  }
-  }
-  
+}
