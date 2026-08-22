@@ -1,16 +1,19 @@
 const bike = document.getElementById("bike");
-const enemy = document.getElementById("enemy");
+
+const enemy1 = document.getElementById("enemy1");
 const enemy2 = document.getElementById("enemy2");
 
 const scoreText = document.getElementById("score");
 const livesText = document.getElementById("lives");
-const highScoreText = document.getElementById("highScore");
+const bestText = document.getElementById("best");
+const speedText = document.getElementById("speedValue");
 
 const leftButton = document.getElementById("left");
 const rightButton = document.getElementById("right");
 
 const gameOver = document.getElementById("gameOver");
 const finalScore = document.getElementById("finalScore");
+const finalBest = document.getElementById("finalBest");
 const restartButton = document.getElementById("restart");
 
 let lane = 1;
@@ -22,33 +25,34 @@ let speed = 5;
 
 let running = true;
 
-let enemyY = -120;
-let enemy2Y = -500;
+let enemy1Y = -150;
+let enemy2Y = -550;
 
-let enemyLane = 0;
+let enemy1Lane = 0;
 let enemy2Lane = 2;
 
-let highScore = Number(localStorage.getItem("bikeHighScore")) || 0;
+let best = Number(localStorage.getItem("bikeBest")) || 0;
 
-highScoreText.textContent = highScore;
+bestText.textContent = best;
 
 
-/* -----------------------
-   Lane positions
------------------------ */
+/* Lane position */
 
-function lanePosition(n) {
+function lanePosition(lane) {
 
-  if (n === 0) return 16.66;
-  if (n === 1) return 50;
+  if (lane === 0) {
+    return 16.66;
+  }
+
+  if (lane === 1) {
+    return 50;
+  }
+
   return 83.33;
-
 }
 
 
-/* -----------------------
-   Update bike
------------------------ */
+/* Bike movement */
 
 function updateBike() {
 
@@ -57,85 +61,78 @@ function updateBike() {
 }
 
 
-/* -----------------------
-   Move left
------------------------ */
-
 function moveLeft() {
 
   if (!running) return;
 
   if (lane > 0) {
+
     lane--;
+
     updateBike();
+
   }
 
 }
 
-
-/* -----------------------
-   Move right
------------------------ */
 
 function moveRight() {
 
   if (!running) return;
 
   if (lane < 2) {
+
     lane++;
+
     updateBike();
+
   }
 
 }
 
 
-/* -----------------------
-   Buttons
------------------------ */
+/* Buttons */
 
 leftButton.addEventListener("click", moveLeft);
+
 rightButton.addEventListener("click", moveRight);
 
 
-/* -----------------------
-   Keyboard
------------------------ */
+/* Keyboard */
 
-document.addEventListener("keydown", function(e) {
+document.addEventListener("keydown", function(event) {
 
-  if (e.key === "ArrowLeft") {
+  if (event.key === "ArrowLeft") {
     moveLeft();
   }
 
-  if (e.key === "ArrowRight") {
+  if (event.key === "ArrowRight") {
     moveRight();
   }
 
 });
 
 
-/* -----------------------
-   Touch swipe
------------------------ */
+/* Swipe */
 
-let touchStartX = 0;
+let startX = 0;
 
-document.addEventListener("touchstart", function(e) {
+document.addEventListener("touchstart", function(event) {
 
-  touchStartX = e.touches[0].clientX;
+  startX = event.touches[0].clientX;
 
-}, {passive:true});
+}, { passive: true });
 
 
-document.addEventListener("touchend", function(e) {
+document.addEventListener("touchend", function(event) {
 
-  const touchEndX = e.changedTouches[0].clientX;
+  const endX = event.changedTouches[0].clientX;
 
-  const difference = touchEndX - touchStartX;
+  const distance = endX - startX;
 
-  if (Math.abs(difference) > 40) {
+  if (Math.abs(distance) > 40) {
 
-    if (difference < 0) {
+    if (distance < 0) {
       moveLeft();
     } else {
       moveRight();
@@ -143,12 +140,10 @@ document.addEventListener("touchend", function(e) {
 
   }
 
-}, {passive:true});
+}, { passive: true });
 
 
-/* -----------------------
-   Random lane
------------------------ */
+/* Random lane */
 
 function randomLane() {
 
@@ -157,18 +152,16 @@ function randomLane() {
 }
 
 
-/* -----------------------
-   Reset enemy
------------------------ */
+/* Reset enemies */
 
-function resetEnemy() {
+function resetEnemy1() {
 
-  enemyLane = randomLane();
+  enemy1Lane = randomLane();
 
-  enemyY = -120;
+  enemy1Y = -150;
 
-  enemy.style.left =
-    lanePosition(enemyLane) + "%";
+  enemy1.style.left =
+    lanePosition(enemy1Lane) + "%";
 
 }
 
@@ -177,7 +170,7 @@ function resetEnemy2() {
 
   enemy2Lane = randomLane();
 
-  enemy2Y = -500;
+  enemy2Y = -550;
 
   enemy2.style.left =
     lanePosition(enemy2Lane) + "%";
@@ -185,28 +178,27 @@ function resetEnemy2() {
 }
 
 
-/* -----------------------
-   Collision
------------------------ */
+/* Collision */
 
-function collision(object) {
+function isCollision(object) {
 
-  const a = bike.getBoundingClientRect();
-  const b = object.getBoundingClientRect();
+  const bikeBox = bike.getBoundingClientRect();
+
+  const enemyBox = object.getBoundingClientRect();
+
+  const padding = 12;
 
   return (
-    a.left < b.right &&
-    a.right > b.left &&
-    a.top < b.bottom &&
-    a.bottom > b.top
+    bikeBox.left + padding < enemyBox.right - padding &&
+    bikeBox.right - padding > enemyBox.left + padding &&
+    bikeBox.top + padding < enemyBox.bottom - padding &&
+    bikeBox.bottom - padding > enemyBox.top + padding
   );
 
 }
 
 
-/* -----------------------
-   Crash
------------------------ */
+/* Crash */
 
 function crash(object) {
 
@@ -214,7 +206,21 @@ function crash(object) {
 
   livesText.textContent = lives;
 
-  object.style.top = "-150px";
+  object.style.top = "-200px";
+
+  if (navigator.vibrate) {
+    navigator.vibrate(250);
+  }
+
+  bike.style.transform =
+    "translateX(-50%) rotate(8deg)";
+
+  setTimeout(function() {
+
+    bike.style.transform =
+      "translateX(-50%) rotate(0deg)";
+
+  }, 200);
 
   if (lives <= 0) {
 
@@ -225,28 +231,30 @@ function crash(object) {
 }
 
 
-/* -----------------------
-   Game loop
------------------------ */
+/* Game loop */
 
 function gameLoop() {
 
   if (!running) return;
 
-  enemyY += speed;
-  enemy2Y += speed * 0.85;
+  enemy1Y += speed;
 
-  enemy.style.top = enemyY + "px";
-  enemy2.style.top = enemy2Y + "px";
+  enemy2Y += speed * .85;
+
+  enemy1.style.top =
+    enemy1Y + "px";
+
+  enemy2.style.top =
+    enemy2Y + "px";
 
 
   /* Enemy 1 */
 
-  if (enemyY > window.innerHeight) {
+  if (enemy1Y > window.innerHeight) {
 
     score++;
 
-    resetEnemy();
+    resetEnemy1();
 
   }
 
@@ -264,27 +272,37 @@ function gameLoop() {
 
   /* Collision */
 
-  if (collision(enemy)) {
-    crash(enemy);
-    resetEnemy();
+  if (isCollision(enemy1)) {
+
+    crash(enemy1);
+
+    resetEnemy1();
+
   }
 
-  if (collision(enemy2)) {
+
+  if (isCollision(enemy2)) {
+
     crash(enemy2);
+
     resetEnemy2();
+
   }
 
 
-  /* Score */
+  /* Difficulty */
 
-  scoreText.textContent = score;
+  speed = Math.min(
+    12,
+    5 + score / 25
+  );
+
+  speedText.textContent =
+    Math.floor(speed - 3);
 
 
-  /* Increase difficulty */
-
-  if (score > 0 && score % 10 === 0) {
-    speed = Math.min(13, 5 + score / 20);
-  }
+  scoreText.textContent =
+    score;
 
 
   requestAnimationFrame(gameLoop);
@@ -292,9 +310,7 @@ function gameLoop() {
 }
 
 
-/* -----------------------
-   Score timer
------------------------ */
+/* Time score */
 
 setInterval(function() {
 
@@ -302,42 +318,45 @@ setInterval(function() {
 
   score++;
 
-  scoreText.textContent = score;
+  scoreText.textContent =
+    score;
 
 }, 1000);
 
 
-/* -----------------------
-   End game
------------------------ */
+/* Game over */
 
 function endGame() {
 
   running = false;
 
-  finalScore.textContent = score;
+  if (score > best) {
 
-  if (score > highScore) {
-
-    highScore = score;
+    best = score;
 
     localStorage.setItem(
-      "bikeHighScore",
-      highScore
+      "bikeBest",
+      best
     );
-
-    highScoreText.textContent = highScore;
 
   }
 
-  gameOver.style.display = "block";
+  finalScore.textContent =
+    score;
+
+  finalBest.textContent =
+    best;
+
+  bestText.textContent =
+    best;
+
+  gameOver.style.display =
+    "block";
 
 }
 
 
-/* -----------------------
-   Restart
------------------------ */
+/* Restart */
 
 restartButton.addEventListener("click", function() {
 
@@ -352,13 +371,17 @@ restartButton.addEventListener("click", function() {
   running = true;
 
   scoreText.textContent = "0";
+
   livesText.textContent = "3";
+
+  speedText.textContent = "1";
 
   gameOver.style.display = "none";
 
   updateBike();
 
-  resetEnemy();
+  resetEnemy1();
+
   resetEnemy2();
 
   requestAnimationFrame(gameLoop);
@@ -366,13 +389,12 @@ restartButton.addEventListener("click", function() {
 });
 
 
-/* -----------------------
-   Start
------------------------ */
+/* Start */
 
 updateBike();
 
-resetEnemy();
+resetEnemy1();
+
 resetEnemy2();
 
 requestAnimationFrame(gameLoop);
