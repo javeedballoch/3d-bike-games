@@ -12,7 +12,7 @@ body {
   height: 100%;
   overflow: hidden;
   font-family: Arial, sans-serif;
-  background: #53b84b;
+  background: #48ad43;
 }
 
 #game {
@@ -20,40 +20,70 @@ body {
   height: 100vh;
   position: relative;
   overflow: hidden;
-  background:
-    linear-gradient(
-      #75c7ff 0%,
-      #a8ddff 28%,
-      #5abb4d 28%,
-      #42a940 100%
-    );
+}
+
+/* SKY */
+
+#sky {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    #55bff5 0%,
+    #b7e8ff 42%,
+    #4caf45 42%,
+    #3fa33d 100%
+  );
+}
+
+/* Mountains */
+
+.mountain {
+  position: absolute;
+  bottom: 56%;
+  width: 0;
+  height: 0;
+  border-left: 150px solid transparent;
+  border-right: 150px solid transparent;
+  border-bottom: 180px solid #487f61;
+}
+
+.mountain1 {
+  left: -120px;
+}
+
+.mountain2 {
+  right: -120px;
+  transform: scale(.85);
+  border-bottom-color: #396f55;
 }
 
 /* HUD */
 
 #hud {
   position: absolute;
-  top: 14px;
+  top: 12px;
   left: 50%;
   transform: translateX(-50%);
-  width: min(94vw, 600px);
+
+  width: min(96vw, 650px);
 
   display: flex;
   justify-content: space-between;
 
   color: white;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: bold;
 
-  z-index: 100;
+  text-shadow: 2px 2px 4px #000;
 
-  text-shadow: 2px 2px 3px #000;
+  z-index: 100;
 }
 
-/* Road */
+/* ROAD */
 
 #road {
   position: absolute;
+
   left: 50%;
   transform: translateX(-50%);
 
@@ -63,55 +93,20 @@ body {
   background:
     linear-gradient(
       90deg,
-      #252525 0%,
-      #404040 5%,
-      #444 50%,
-      #404040 95%,
-      #252525 100%
+      #242424 0%,
+      #414141 5%,
+      #484848 50%,
+      #414141 95%,
+      #242424 100%
     );
 
   border-left: 9px solid white;
   border-right: 9px solid white;
 
   overflow: hidden;
-
-  perspective: 500px;
 }
 
-/* Road lines */
-
-.road-line {
-  position: absolute;
-
-  top: -160px;
-
-  width: 9px;
-  height: 115px;
-
-  background: #eee;
-
-  animation: roadMove .55s linear infinite;
-}
-
-.line-a {
-  left: 33.33%;
-}
-
-.line-b {
-  left: 66.66%;
-}
-
-@keyframes roadMove {
-  0% {
-    transform: translateY(-180px);
-  }
-
-  100% {
-    transform: translateY(110vh);
-  }
-}
-
-/* Road edge */
+/* Red white road border */
 
 #road::before,
 #road::after {
@@ -120,17 +115,17 @@ body {
   position: absolute;
   top: 0;
 
-  width: 7px;
+  width: 8px;
   height: 100%;
 
   background:
     repeating-linear-gradient(
       to bottom,
-      white 0 28px,
-      #e52222 28px 56px
+      white 0 25px,
+      #e32626 25px 50px
     );
 
-  z-index: 10;
+  z-index: 20;
 }
 
 #road::before {
@@ -141,157 +136,220 @@ body {
   right: 0;
 }
 
+/* Road lines */
+
+.roadLine {
+  position: absolute;
+
+  top: -150px;
+
+  width: 10px;
+  height: 110px;
+
+  background: white;
+
+  animation: roadMove .55s linear infinite;
+}
+
+.line1 {
+  left: 33.33%;
+}
+
+.line2 {
+  left: 66.66%;
+}
+
+@keyframes roadMove {
+  from {
+    transform: translateY(-150px);
+  }
+
+  to {
+    transform: translateY(110vh);
+  }
+}
+
 /* Trees */
 
 .tree {
   position: absolute;
 
-  font-size: 45px;
+  font-size: 44px;
 
-  z-index: 5;
+  z-index: 8;
 
-  animation: treesMove 2.2s linear infinite;
+  animation: treeMove 1.8s linear infinite;
 }
 
-.tree1 {
-  left: -48px;
+.t1 {
+  left: -52px;
   top: 5%;
 }
 
-.tree2 {
-  right: -50px;
-  top: 30%;
-  animation-delay: -.7s;
+.t2 {
+  right: -52px;
+  top: 18%;
+  animation-delay: -.4s;
 }
 
-.tree3 {
-  left: -48px;
+.t3 {
+  left: -52px;
+  top: 38%;
+  animation-delay: -.9s;
+}
+
+.t4 {
+  right: -52px;
   top: 55%;
-  animation-delay: -1.2s;
+  animation-delay: -1.4s;
 }
 
-.tree4 {
-  right: -50px;
-  top: 80%;
+.t5 {
+  left: -52px;
+  top: 72%;
   animation-delay: -.3s;
 }
 
-@keyframes treesMove {
+.t6 {
+  right: -52px;
+  top: 88%;
+  animation-delay: -1s;
+}
+
+@keyframes treeMove {
   from {
-    transform: translateY(-100px);
+    transform: translateY(-180px);
   }
 
   to {
-    transform: translateY(130px);
+    transform: translateY(180px);
   }
 }
 
-/* Bike */
+/* BIKE */
 
 #bike {
   position: absolute;
 
   width: 66px;
-  height: 112px;
+  height: 115px;
 
-  bottom: 105px;
   left: 50%;
+  bottom: 105px;
 
   transform: translateX(-50%);
 
-  z-index: 30;
+  z-index: 40;
 
-  transition: left .14s ease;
+  transition: left .13s ease;
 }
 
 /* Wheels */
 
-.bike-wheel {
+.wheel {
   position: absolute;
 
-  width: 19px;
-  height: 36px;
+  width: 20px;
+  height: 38px;
 
   left: 23px;
 
-  border-radius: 50%;
-
-  background:
-    linear-gradient(
-      90deg,
-      #050505,
-      #555,
-      #050505
-    );
+  background: linear-gradient(
+    90deg,
+    #050505,
+    #555,
+    #050505
+  );
 
   border: 2px solid #111;
+
+  border-radius: 50%;
 }
 
-.wheel1 {
+.frontWheel {
   top: 0;
 }
 
-.wheel2 {
+.backWheel {
   bottom: 0;
 }
 
 /* Bike body */
 
-.bike-engine {
+.bodyBike {
   position: absolute;
 
-  width: 32px;
-  height: 43px;
+  width: 34px;
+  height: 53px;
 
-  left: 17px;
-  top: 36px;
+  left: 16px;
+  top: 37px;
 
-  background:
-    linear-gradient(
-      90deg,
-      #850000,
-      #f52222,
-      #8c0000
-    );
+  border-radius: 15px 15px 8px 8px;
 
-  border-radius: 14px 14px 8px 8px;
+  background: linear-gradient(
+    90deg,
+    #8c0000,
+    #ff2222,
+    #a00000
+  );
 
-  box-shadow: 0 0 5px #000;
+  box-shadow: 0 2px 6px #111;
 }
 
-.bike-seat {
+.engine {
+  position: absolute;
+
+  width: 28px;
+  height: 28px;
+
+  left: 19px;
+  top: 61px;
+
+  border-radius: 50%;
+
+  background: radial-gradient(
+    circle,
+    #888 0 20%,
+    #222 21% 55%,
+    #777 56% 65%,
+    #111 66%
+  );
+}
+
+.seat {
   position: absolute;
 
   width: 27px;
-  height: 11px;
+  height: 10px;
 
   left: 20px;
   top: 30px;
 
-  background: #111;
-
   border-radius: 8px;
+
+  background: #111;
 }
 
-.bike-handle {
+.handle {
   position: absolute;
 
-  width: 38px;
+  width: 40px;
   height: 5px;
 
-  left: 14px;
+  left: 13px;
   top: 27px;
 
   background: #111;
 
-  transform: rotate(-4deg);
+  transform: rotate(-5deg);
 }
 
-.bike-rider {
+.rider {
   position: absolute;
 
   width: 25px;
-  height: 30px;
+  height: 31px;
 
   left: 21px;
   top: 17px;
@@ -301,23 +359,60 @@ body {
   border-radius: 50% 50% 35% 35%;
 }
 
-.bike-head {
+.helmet {
   position: absolute;
 
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
 
-  left: 24px;
-  top: 7px;
-
-  background: #111;
+  left: 23px;
+  top: 5px;
 
   border-radius: 50%;
+
+  background: #111;
 
   border: 3px solid #777;
 }
 
-/* Enemy cars */
+/* Nitro flame */
+
+#nitroFire {
+  position: absolute;
+
+  width: 18px;
+  height: 32px;
+
+  left: 24px;
+  bottom: -25px;
+
+  display: none;
+
+  background: linear-gradient(
+    #fff,
+    #ffcc00,
+    #ff3300
+  );
+
+  border-radius: 50%;
+}
+
+#bike.nitro #nitroFire {
+  display: block;
+  animation: flame .08s infinite alternate;
+}
+
+@keyframes flame {
+  from {
+    transform: scaleY(.7);
+  }
+
+  to {
+    transform: scaleY(1.25);
+  }
+}
+
+/* CARS */
 
 .car {
   position: absolute;
@@ -325,7 +420,7 @@ body {
   width: 60px;
   height: 88px;
 
-  top: -130px;
+  top: -150px;
 
   transform: translateX(-50%);
 
@@ -333,53 +428,59 @@ body {
 
   box-shadow:
     inset 0 0 0 3px #222,
-    0 4px 8px #111;
+    0 5px 10px #111;
 
-  z-index: 25;
+  z-index: 30;
 }
 
 .red {
-  background:
-    linear-gradient(
-      90deg,
-      #8b0000,
-      #ff2525,
-      #8b0000
-    );
+  background: linear-gradient(
+    90deg,
+    #850000,
+    #ff2525,
+    #850000
+  );
 }
 
 .blue {
-  background:
-    linear-gradient(
-      90deg,
-      #003d88,
-      #0879df,
-      #003d88
-    );
+  background: linear-gradient(
+    90deg,
+    #003b83,
+    #0879e0,
+    #003b83
+  );
 }
 
-.window {
+.yellow {
+  background: linear-gradient(
+    90deg,
+    #b87500,
+    #ffd21c,
+    #b87500
+  );
+}
+
+.carWindow {
   position: absolute;
 
   width: 40px;
   height: 27px;
 
-  top: 10px;
   left: 10px;
-
-  background:
-    linear-gradient(
-      135deg,
-      #c7f4ff,
-      #315f78
-    );
+  top: 10px;
 
   border-radius: 6px;
+
+  background: linear-gradient(
+    135deg,
+    #d8f6ff,
+    #316278
+  );
 
   border: 2px solid #111;
 }
 
-.light {
+.headlight {
   position: absolute;
 
   width: 10px;
@@ -387,43 +488,94 @@ body {
 
   bottom: 8px;
 
-  background: #ffd900;
+  background: #ffe100;
 
   border-radius: 3px;
 }
 
-.light.l {
+.leftLight {
   left: 8px;
 }
 
-.light.r {
+.rightLight {
   right: 8px;
 }
 
-/* Speed */
+/* Coins */
 
-#speed {
+.coin {
   position: absolute;
 
-  bottom: 100px;
-  right: 15px;
+  font-size: 30px;
+
+  top: -100px;
+
+  transform: translateX(-50%);
+
+  z-index: 28;
+
+  filter: drop-shadow(0 2px 3px #111);
+
+  animation: coinSpin .5s linear infinite;
+}
+
+@keyframes coinSpin {
+  50% {
+    transform: translateX(-50%) rotateY(180deg);
+  }
+}
+
+/* SPEED */
+
+#speedBox {
+  position: absolute;
+
+  right: 12px;
+  bottom: 105px;
 
   color: white;
 
-  font-size: 14px;
   font-weight: bold;
 
-  z-index: 100;
-
   text-shadow: 2px 2px 3px #000;
+
+  z-index: 100;
 }
 
-/* Controls */
+/* NITRO */
+
+#nitro {
+  position: absolute;
+
+  right: 12px;
+  bottom: 155px;
+
+  padding: 10px 13px;
+
+  border: none;
+  border-radius: 12px;
+
+  background: #ff5a00;
+
+  color: white;
+
+  font-weight: bold;
+
+  box-shadow: 0 3px 8px #222;
+
+  z-index: 100;
+}
+
+#nitro:active {
+  transform: scale(.9);
+}
+
+/* CONTROLS */
 
 #controls {
   position: absolute;
 
-  bottom: 15px;
+  bottom: 12px;
   left: 50%;
 
   transform: translateX(-50%);
@@ -439,30 +591,22 @@ body {
 }
 
 #controls button {
-  width: 82px;
-  height: 62px;
+  width: 78px;
+  height: 60px;
 
   border: none;
-
   border-radius: 18px;
 
-  background: rgba(0, 0, 0, .78);
+  background: rgba(0,0,0,.78);
 
   color: white;
 
-  font-size: 35px;
-
-  box-shadow:
-    0 5px 12px rgba(0, 0, 0, .5);
+  font-size: 34px;
 
   touch-action: manipulation;
 }
 
-#controls button:active {
-  transform: scale(.9);
-}
-
-/* Game over */
+/* GAME OVER */
 
 #gameOver {
   display: none;
@@ -472,18 +616,18 @@ body {
   top: 50%;
   left: 50%;
 
-  transform: translate(-50%, -50%);
+  transform: translate(-50%,-50%);
 
-  width: 86%;
+  width: 85%;
   max-width: 390px;
 
-  padding: 30px;
+  padding: 28px;
 
   text-align: center;
 
-  background: rgba(0, 0, 0, .94);
-
   color: white;
+
+  background: rgba(0,0,0,.95);
 
   border-radius: 24px;
 
@@ -491,26 +635,24 @@ body {
 }
 
 #gameOver h1 {
-  color: #ff3333;
+  color: #ff3030;
 
-  font-size: 42px;
+  font-size: 40px;
 
   margin-bottom: 15px;
 }
 
 #gameOver p {
-  font-size: 22px;
-
-  margin: 8px 0;
+  font-size: 21px;
+  margin: 8px;
 }
 
 #restart {
-  margin-top: 20px;
+  margin-top: 18px;
 
-  padding: 14px 28px;
+  padding: 13px 24px;
 
   border: none;
-
   border-radius: 12px;
 
   background: #00c853;
@@ -518,18 +660,5 @@ body {
   color: white;
 
   font-size: 18px;
-
   font-weight: bold;
-}
-
-@media(max-width:600px) {
-
-  #hud {
-    font-size: 18px;
-  }
-
-  #controls button {
-    width: 76px;
-    height: 58px;
-  }
 }
