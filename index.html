@@ -2,41 +2,74 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Bike Racing Game</title>
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Street Bike Racing</title>
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-  <div id="game">
+<div id="game">
 
-    <div id="score">Score: 0</div>
+  <div id="hud">
+    <div>🏆 <span id="score">0</span></div>
+    <div>❤️ <span id="lives">3</span></div>
+    <div>BEST <span id="best">0</span></div>
+  </div>
 
-    <div id="road">
+  <div id="road">
 
-      <div class="lane-line line1"></div>
-      <div class="lane-line line2"></div>
+    <div class="road-line line-a"></div>
+    <div class="road-line line-b"></div>
 
-      <div id="bike">🏍️</div>
+    <div class="tree tree1">🌳</div>
+    <div class="tree tree2">🌳</div>
+    <div class="tree tree3">🌲</div>
+    <div class="tree tree4">🌳</div>
 
-      <div id="obstacle">🚗</div>
-
+    <div id="enemy1" class="car red">
+      <div class="window"></div>
+      <div class="light l"></div>
+      <div class="light r"></div>
     </div>
 
-    <div id="gameOver">
-      <h1>GAME OVER</h1>
-      <p id="finalScore">Score: 0</p>
-      <button id="restart">RESTART</button>
+    <div id="enemy2" class="car blue">
+      <div class="window"></div>
+      <div class="light l"></div>
+      <div class="light r"></div>
     </div>
 
-    <div class="controls">
-      <button id="left">⬅️</button>
-      <button id="right">➡️</button>
+    <div id="bike">
+      <div class="bike-wheel wheel1"></div>
+      <div class="bike-wheel wheel2"></div>
+      <div class="bike-seat"></div>
+      <div class="bike-engine"></div>
+      <div class="bike-handle"></div>
+      <div class="bike-rider"></div>
+      <div class="bike-head"></div>
     </div>
 
   </div>
 
-  <script src="script.js"></script>
+  <div id="speed">
+    SPEED <span id="speedValue">1</span>
+  </div>
+
+  <div id="controls">
+    <button id="left">◀</button>
+    <button id="right">▶</button>
+  </div>
+
+  <div id="gameOver">
+    <h1>CRASH!</h1>
+    <p>Score: <b id="finalScore">0</b></p>
+    <p>Best: <b id="finalBest">0</b></p>
+    <button id="restart">RACE AGAIN</button>
+  </div>
+
+</div>
+
+<script src="script.js"></script>
 </body>
-</html>
+                                       </html>
