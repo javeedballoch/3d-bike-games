@@ -1,58 +1,60 @@
 const bike = document.getElementById("bike");
 
-const enemy1 = document.getElementById("enemy1");
-const enemy2 = document.getElementById("enemy2");
+const cars = [
+  document.getElementById("car1"),
+  document.getElementById("car2"),
+  document.getElementById("car3")
+];
+
+const coins = [
+  document.getElementById("coin1"),
+  document.getElementById("coin2")
+];
 
 const scoreText = document.getElementById("score");
 const livesText = document.getElementById("lives");
+const coinsText = document.getElementById("coins");
 const bestText = document.getElementById("best");
-const speedText = document.getElementById("speedValue");
+const speedText = document.getElementById("speed");
 
 const leftButton = document.getElementById("left");
 const rightButton = document.getElementById("right");
+const nitroButton = document.getElementById("nitro");
 
 const gameOver = document.getElementById("gameOver");
 const finalScore = document.getElementById("finalScore");
+const finalCoins = document.getElementById("finalCoins");
 const finalBest = document.getElementById("finalBest");
 const restartButton = document.getElementById("restart");
 
 let lane = 1;
 
 let score = 0;
+let coinScore = 0;
 let lives = 3;
 
 let speed = 5;
+let nitro = false;
 
 let running = true;
-
-let enemy1Y = -150;
-let enemy2Y = -550;
-
-let enemy1Lane = 0;
-let enemy2Lane = 2;
 
 let best = Number(localStorage.getItem("bikeBest")) || 0;
 
 bestText.textContent = best;
 
 
-/* Lane position */
+/* Lane positions */
 
-function lanePosition(lane) {
+function lanePosition(n) {
 
-  if (lane === 0) {
-    return 16.66;
-  }
-
-  if (lane === 1) {
-    return 50;
-  }
-
+  if (n === 0) return 16.66;
+  if (n === 1) return 50;
   return 83.33;
+
 }
 
 
-/* Bike movement */
+/* Bike */
 
 function updateBike() {
 
@@ -66,11 +68,8 @@ function moveLeft() {
   if (!running) return;
 
   if (lane > 0) {
-
     lane--;
-
     updateBike();
-
   }
 
 }
@@ -81,11 +80,8 @@ function moveRight() {
   if (!running) return;
 
   if (lane < 2) {
-
     lane++;
-
     updateBike();
-
   }
 
 }
@@ -94,21 +90,16 @@ function moveRight() {
 /* Buttons */
 
 leftButton.addEventListener("click", moveLeft);
-
 rightButton.addEventListener("click", moveRight);
 
 
 /* Keyboard */
 
-document.addEventListener("keydown", function(event) {
+document.addEventListener("keydown", function(e) {
 
-  if (event.key === "ArrowLeft") {
-    moveLeft();
-  }
+  if (e.key === "ArrowLeft") moveLeft();
 
-  if (event.key === "ArrowRight") {
-    moveRight();
-  }
+  if (e.key === "ArrowRight") moveRight();
 
 });
 
@@ -117,16 +108,16 @@ document.addEventListener("keydown", function(event) {
 
 let startX = 0;
 
-document.addEventListener("touchstart", function(event) {
+document.addEventListener("touchstart", function(e) {
 
-  startX = event.touches[0].clientX;
+  startX = e.touches[0].clientX;
 
 }, { passive: true });
 
 
-document.addEventListener("touchend", function(event) {
+document.addEventListener("touchend", function(e) {
 
-  const endX = event.changedTouches[0].clientX;
+  const endX = e.changedTouches[0].clientX;
 
   const distance = endX - startX;
 
@@ -152,153 +143,230 @@ function randomLane() {
 }
 
 
-/* Reset enemies */
+/* Car positions */
 
-function resetEnemy1() {
+let carData = cars.map((car, index) => ({
+  element: car,
+  lane: index % 3,
+  y: -200 - index * 250
+}));
 
-  enemy1Lane = randomLane();
 
-  enemy1Y = -150;
+function resetCar(data, extraDistance = 0) {
 
-  enemy1.style.left =
-    lanePosition(enemy1Lane) + "%";
+  data.lane = randomLane();
+
+  data.y = -150 - Math.random() * 300 - extraDistance;
+
+  data.element.style.left =
+    lanePosition(data.lane) + "%";
+
+  data.element.style.top =
+    data.y + "px";
 
 }
 
 
-function resetEnemy2() {
+/* Coins */
 
-  enemy2Lane = randomLane();
+let coinData = coins.map((coin, index) => ({
+  element: coin,
+  lane: index === 0 ? 0 : 2,
+  y: -300 - index * 500
+}));
 
-  enemy2Y = -550;
 
-  enemy2.style.left =
-    lanePosition(enemy2Lane) + "%";
+function resetCoin(data) {
+
+  data.lane = randomLane();
+
+  data.y = -200 - Math.random() * 500;
+
+  data.element.style.left =
+    lanePosition(data.lane) + "%";
+
+  data.element.style.top =
+    data.y + "px";
 
 }
 
 
 /* Collision */
 
-function isCollision(object) {
+function collision(a, b) {
 
-  const bikeBox = bike.getBoundingClientRect();
+  const A = a.getBoundingClientRect();
+  const B = b.getBoundingClientRect();
 
-  const enemyBox = object.getBoundingClientRect();
-
-  const padding = 12;
+  const padding = 9;
 
   return (
-    bikeBox.left + padding < enemyBox.right - padding &&
-    bikeBox.right - padding > enemyBox.left + padding &&
-    bikeBox.top + padding < enemyBox.bottom - padding &&
-    bikeBox.bottom - padding > enemyBox.top + padding
+    A.left + padding < B.right - padding &&
+    A.right - padding > B.left + padding &&
+    A.top + padding < B.bottom - padding &&
+    A.bottom - padding > B.top + padding
   );
 
 }
 
 
-/* Crash */
+/* Car crash */
 
-function crash(object) {
+function crash(data) {
 
   lives--;
 
   livesText.textContent = lives;
 
-  object.style.top = "-200px";
+  data.y = -200;
 
-  if (navigator.vibrate) {
-    navigator.vibrate(250);
-  }
+  data.element.style.top = "-200px";
 
   bike.style.transform =
-    "translateX(-50%) rotate(8deg)";
+    "translateX(-50%) rotate(10deg)";
 
-  setTimeout(function() {
+  if (navigator.vibrate) {
+    navigator.vibrate(300);
+  }
+
+  setTimeout(() => {
 
     bike.style.transform =
       "translateX(-50%) rotate(0deg)";
 
-  }, 200);
+  }, 250);
 
   if (lives <= 0) {
-
     endGame();
-
   }
 
 }
 
 
-/* Game loop */
+/* Coin collection */
+
+function collectCoin(data) {
+
+  coinScore++;
+
+  coinsText.textContent = coinScore;
+
+  score += 5;
+
+  data.y = -300;
+
+  data.element.style.top = "-300px";
+
+  if (navigator.vibrate) {
+    navigator.vibrate(80);
+  }
+
+}
+
+
+/* Nitro */
+
+let nitroTimer = null;
+
+nitroButton.addEventListener("click", function() {
+
+  if (!running || nitro) return;
+
+  nitro = true;
+
+  bike.classList.add("nitro");
+
+  speed += 8;
+
+  clearTimeout(nitroTimer);
+
+  nitroTimer = setTimeout(function() {
+
+    speed -= 8;
+
+    nitro = false;
+
+    bike.classList.remove("nitro");
+
+  }, 3000);
+
+});
+
+
+/* Main game */
 
 function gameLoop() {
 
   if (!running) return;
 
-  enemy1Y += speed;
+  const currentSpeed = speed;
 
-  enemy2Y += speed * .85;
+  /* Cars */
 
-  enemy1.style.top =
-    enemy1Y + "px";
+  carData.forEach(function(data) {
 
-  enemy2.style.top =
-    enemy2Y + "px";
+    data.y += currentSpeed;
 
+    data.element.style.top =
+      data.y + "px";
 
-  /* Enemy 1 */
+    if (data.y > window.innerHeight) {
 
-  if (enemy1Y > window.innerHeight) {
+      score++;
 
-    score++;
+      resetCar(data);
 
-    resetEnemy1();
+    }
 
-  }
+    if (collision(bike, data.element)) {
 
+      crash(data);
 
-  /* Enemy 2 */
+      resetCar(data);
 
-  if (enemy2Y > window.innerHeight) {
+    }
 
-    score++;
-
-    resetEnemy2();
-
-  }
+  });
 
 
-  /* Collision */
+  /* Coins */
 
-  if (isCollision(enemy1)) {
+  coinData.forEach(function(data) {
 
-    crash(enemy1);
+    data.y += currentSpeed;
 
-    resetEnemy1();
+    data.element.style.top =
+      data.y + "px";
 
-  }
+    if (data.y > window.innerHeight) {
 
+      resetCoin(data);
 
-  if (isCollision(enemy2)) {
+    }
 
-    crash(enemy2);
+    if (collision(bike, data.element)) {
 
-    resetEnemy2();
+      collectCoin(data);
 
-  }
+    }
+
+  });
 
 
   /* Difficulty */
 
-  speed = Math.min(
-    12,
-    5 + score / 25
-  );
+  if (!nitro) {
+
+    speed = Math.min(
+      11,
+      5 + score / 35
+    );
+
+  }
+
 
   speedText.textContent =
-    Math.floor(speed - 3);
+    Math.max(1, Math.floor(speed - 3));
 
 
   scoreText.textContent =
@@ -310,16 +378,13 @@ function gameLoop() {
 }
 
 
-/* Time score */
+/* Score */
 
 setInterval(function() {
 
   if (!running) return;
 
   score++;
-
-  scoreText.textContent =
-    score;
 
 }, 1000);
 
@@ -341,17 +406,13 @@ function endGame() {
 
   }
 
-  finalScore.textContent =
-    score;
+  finalScore.textContent = score;
+  finalCoins.textContent = coinScore;
+  finalBest.textContent = best;
 
-  finalBest.textContent =
-    best;
+  bestText.textContent = best;
 
-  bestText.textContent =
-    best;
-
-  gameOver.style.display =
-    "block";
+  gameOver.style.display = "block";
 
 }
 
@@ -361,28 +422,33 @@ function endGame() {
 restartButton.addEventListener("click", function() {
 
   score = 0;
-
+  coinScore = 0;
   lives = 3;
 
   speed = 5;
+  nitro = false;
 
   lane = 1;
-
   running = true;
 
   scoreText.textContent = "0";
-
+  coinsText.textContent = "0";
   livesText.textContent = "3";
-
   speedText.textContent = "1";
 
   gameOver.style.display = "none";
 
+  bike.classList.remove("nitro");
+
   updateBike();
 
-  resetEnemy1();
+  carData.forEach(function(data, index) {
+    resetCar(data, index * 180);
+  });
 
-  resetEnemy2();
+  coinData.forEach(function(data) {
+    resetCoin(data);
+  });
 
   requestAnimationFrame(gameLoop);
 
@@ -393,8 +459,12 @@ restartButton.addEventListener("click", function() {
 
 updateBike();
 
-resetEnemy1();
+carData.forEach(function(data, index) {
+  resetCar(data, index * 180);
+});
 
-resetEnemy2();
+coinData.forEach(function(data) {
+  resetCoin(data);
+});
 
 requestAnimationFrame(gameLoop);
