@@ -1,255 +1,290 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Mountain Highway Bike Racing</title>
+<title>Mountain Bike Racing</title>
 
 <style>
 *{box-sizing:border-box}
 html,body{
  margin:0;width:100%;height:100%;overflow:hidden;
- background:#10151b;font-family:Arial,sans-serif
+ font-family:Arial,sans-serif;background:#222
 }
 #game{
  position:fixed;inset:0;overflow:hidden;
- background:#78a7c4
+ background:#6fa0bd
 }
-.scene{
+
+/* REAL MOUNTAIN BACKGROUND */
+.mountains{
  position:absolute;inset:0;
- background-image:url("https://commons.wikimedia.org/wiki/Special:Redirect/file/Mountain_highway_(Unsplash).jpg?width=1600");
- background-size:cover;
- background-position:center 42%;
- filter:saturate(1.08) contrast(1.04)
+ background:
+ url("https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Mountain_highway_%28Unsplash%29.jpg/1280px-Mountain_highway_%28Unsplash%29.jpg")
+ center/cover no-repeat;
 }
-.shade{
- position:absolute;inset:0;
- background:linear-gradient(
-  to bottom,
-  rgba(5,20,30,.08),
-  rgba(5,10,15,.12) 48%,
-  rgba(5,8,10,.72) 100%
- )
-}
-.road{
- position:absolute;
- left:50%;bottom:-10%;
- width:82%;height:75%;
- transform:translateX(-50%) perspective(500px) rotateX(8deg);
- background:linear-gradient(90deg,#202328,#4a4d50 48%,#202328);
- clip-path:polygon(38% 0,62% 0,100% 100%,0 100%);
- box-shadow:0 -10px 30px rgba(0,0,0,.2)
-}
-.road:before{
+.mountains:after{
  content:"";
  position:absolute;inset:0;
+ background:linear-gradient(
+  rgba(20,40,50,.05),
+  rgba(5,10,15,.18) 50%,
+  rgba(5,8,12,.55)
+ );
+}
+
+/* ROAD */
+.road{
+ position:absolute;
+ left:50%;bottom:-5%;
+ transform:translateX(-50%);
+ width:88%;height:73%;
+ background:linear-gradient(
+  90deg,#24282b,#505357 50%,#24282b
+ );
+ clip-path:polygon(39% 0,61% 0,100% 100%,0 100%);
+ box-shadow:0 -5px 30px #111;
+}
+.roadLine{
+ position:absolute;
+ left:50%;bottom:0;
+ width:7px;height:72%;
+ transform:translateX(-50%);
  background:repeating-linear-gradient(
   to bottom,
-  transparent 0 11%,
-  rgba(255,255,255,.9) 11.5% 13%,
-  transparent 13.5% 24%
+  #fff 0 45px,
+  transparent 45px 95px
  );
- clip-path:polygon(48.8% 0,51.2% 0,55% 100%,45% 100%)
+ opacity:.9;
 }
-.rail{
- position:absolute;bottom:31%;
- width:48%;height:7px;
- background:#b9c0c3;
- box-shadow:0 0 5px #fff
-}
-.rail.l{left:-5%;transform:rotate(-10deg)}
-.rail.r{right:-5%;transform:rotate(10deg)}
 
+/* SIDE RAILS */
+.rail{
+ position:absolute;
+ height:5px;width:55%;
+ bottom:30%;
+ background:#d8dde0;
+ box-shadow:0 0 8px white;
+}
+.rail.left{left:-10%;transform:rotate(-8deg)}
+.rail.right{right:-10%;transform:rotate(8deg)}
+
+/* HUD */
 .hud{
  position:absolute;top:12px;left:10px;right:10px;
- display:flex;justify-content:space-between;
- gap:7px;z-index:8
+ display:flex;gap:7px;justify-content:space-between;
+ z-index:20
 }
-.box{
- background:rgba(10,15,21,.78);
- border:1px solid rgba(255,255,255,.18);
- border-radius:9px;
- padding:7px 10px;color:#fff;
- font-weight:800;min-width:72px;
- text-align:center;
- backdrop-filter:blur(5px)
+.stat{
+ background:rgba(12,22,29,.88);
+ border:1px solid #687983;
+ border-radius:10px;
+ min-width:72px;
+ padding:7px 5px;
+ text-align:center;color:white;
+ box-shadow:0 3px 10px #0008
 }
-.box small{
- display:block;font-size:9px;color:#b8c5ce
+.stat small{
+ display:block;color:#bbc7cd;font-size:9px
 }
-.box b{font-size:17px}
+.stat b{font-size:18px}
 
-.center{
- position:absolute;top:77px;left:50%;
+.speed{
+ position:absolute;
+ top:91px;left:50%;
  transform:translateX(-50%);
- color:white;font-weight:900;
- text-shadow:0 2px 5px #000;
- font-size:15px;z-index:8
+ color:#fff;font-size:21px;
+ font-weight:bold;
+ text-shadow:0 3px 6px #000;
+ z-index:20
 }
 
+/* BIKE */
 .bike{
- position:absolute;z-index:7;
- left:50%;bottom:4%;
- width:155px;height:255px;
+ position:absolute;
+ z-index:15;
+ left:50%;bottom:3%;
+ width:145px;height:265px;
  transform:translateX(-50%);
- filter:drop-shadow(0 18px 10px rgba(0,0,0,.65));
- transition:left .08s linear
+ filter:drop-shadow(0 18px 10px #000b)
 }
 .wheel{
- position:absolute;left:50%;
- transform:translateX(-50%);
- width:48px;height:86px;
+ position:absolute;
+ left:50%;transform:translateX(-50%);
+ width:43px;height:82px;
  border-radius:50%;
- background:radial-gradient(
-  circle,#555 0 15%,#111 17% 34%,
-  #444 36% 43%,#090909 45%
- );
- border:4px solid #070707
+ background:
+ radial-gradient(circle,#888 0 13%,#111 15% 34%,
+ #777 36% 42%,#050505 44%);
+ border:4px solid #111
 }
+.wheel.front{top:30px}
 .wheel.back{bottom:0}
-.wheel.front{top:28px}
-
-.body{
- position:absolute;left:50%;top:68px;
+.fairing{
+ position:absolute;
+ left:50%;top:78px;
  transform:translateX(-50%);
- width:78px;height:126px;
- border-radius:35px 35px 18px 18px;
+ width:83px;height:118px;
+ border-radius:38px 38px 25px 25px;
  background:linear-gradient(
-  90deg,#65000b,#e00018 42%,#79000b
+  90deg,#69000a,#f00018 45%,#7a000c
  );
  box-shadow:
-  inset -8px 0 12px rgba(255,255,255,.18),
-  inset 7px 0 10px rgba(0,0,0,.35)
+ inset 7px 0 12px #ff6870,
+ inset -8px 0 12px #350006
 }
 .tail{
- position:absolute;left:50%;top:70px;
+ position:absolute;
+ left:50%;top:69px;
  transform:translateX(-50%);
- width:88px;height:35px;
- background:linear-gradient(#c80014,#5c0008);
- border-radius:50% 50% 35% 35%
+ width:91px;height:39px;
+ background:linear-gradient(#ef1020,#650009);
+ border-radius:50%
 }
 .seat{
- position:absolute;left:50%;top:105px;
+ position:absolute;
+ left:50%;top:103px;
  transform:translateX(-50%);
- width:50px;height:65px;
- border-radius:45%;background:#15171a
-}
-.head{
- position:absolute;left:50%;top:8px;
- transform:translateX(-50%);
- width:34px;height:28px;
- border-radius:50%;background:#111
-}
-.visor{
- position:absolute;left:50%;top:13px;
- transform:translateX(-50%);
- width:25px;height:10px;
- border-radius:8px;background:#172c36
+ width:48px;height:65px;
+ border-radius:50%;
+ background:#101214
 }
 .handle{
- position:absolute;left:50%;top:54px;
+ position:absolute;
+ left:50%;top:57px;
  transform:translateX(-50%);
- width:105px;height:8px;
- background:#16191b;border-radius:5px
+ width:108px;height:8px;
+ border-radius:8px;background:#111
+}
+.rider{
+ position:absolute;
+ left:50%;top:8px;
+ transform:translateX(-50%);
+ width:38px;height:57px;
+ border-radius:50% 50% 40% 40%;
+ background:linear-gradient(#111,#292929)
+}
+.helmet{
+ position:absolute;
+ left:50%;top:10px;
+ transform:translateX(-50%);
+ width:31px;height:27px;
+ border-radius:50%;
+ background:#111;
+ box-shadow:inset 0 -7px 0 #233a46
 }
 .light{
- position:absolute;left:50%;top:77px;
+ position:absolute;
+ left:50%;top:80px;
  transform:translateX(-50%);
- width:18px;height:11px;
+ width:20px;height:12px;
  border-radius:50%;
- background:#fff6a0;
- box-shadow:0 0 12px #fff
+ background:#fff8a0;
+ box-shadow:0 0 18px #fff
 }
 
+/* CARS */
 .car{
- position:absolute;z-index:6;
- width:58px;height:95px;
- border-radius:15px 15px 8px 8px;
- background:linear-gradient(90deg,#222,#aaa 45%,#333);
- box-shadow:0 12px 9px rgba(0,0,0,.45)
+ position:absolute;
+ z-index:10;
+ width:60px;height:96px;
+ border-radius:13px;
+ background:linear-gradient(
+  90deg,#222,#999 45%,#292929
+ );
+ box-shadow:0 10px 15px #0009
 }
 .car:before{
  content:"";
  position:absolute;
- left:9px;right:9px;top:16px;
- height:27px;border-radius:7px;
- background:linear-gradient(#26343b,#9caeb4)
+ left:9px;right:9px;top:14px;
+ height:29px;
+ border-radius:7px;
+ background:linear-gradient(#17242a,#9fb5bd)
 }
 .car:after{
  content:"";
  position:absolute;
- left:12px;right:12px;bottom:8px;
- height:10px;background:#d22;
+ left:13px;right:13px;bottom:9px;
+ height:11px;
  border-radius:4px;
- box-shadow:0 0 8px #f22
+ background:#e60014;
+ box-shadow:0 0 12px #f00
 }
 
+/* COINS */
 .coin{
- position:absolute;z-index:5;
- width:22px;height:22px;
+ position:absolute;
+ z-index:12;
+ width:25px;height:25px;
  border-radius:50%;
- border:4px solid #ffd21a;
- background:#ffec70;
- box-shadow:0 0 18px #ffb300;
- animation:spin .6s linear infinite
-}
-@keyframes spin{
- to{transform:rotateY(360deg)}
+ background:#ffe95b;
+ border:4px solid #ffad00;
+ box-shadow:0 0 18px #ffc400;
 }
 
+/* BUTTONS */
 .controls{
- position:absolute;z-index:10;
- left:0;right:0;bottom:20px;
- display:flex;justify-content:space-between;
- padding:0 18px
+ position:absolute;
+ z-index:30;
+ left:0;right:0;bottom:22px;
+ display:flex;
+ justify-content:space-between;
+ padding:0 35px
 }
-.btn{
+.control{
  width:88px;height:88px;
  border-radius:50%;
- border:2px solid rgba(255,255,255,.45);
- background:rgba(10,15,20,.55);
- color:#fff;font-size:38px;
- font-weight:900;
- box-shadow:0 5px 20px rgba(0,0,0,.35);
+ border:2px solid #dbe1e5;
+ background:#101820aa;
+ color:white;
+ font-size:52px;
+ line-height:70px;
  touch-action:none
 }
-.nitro{
- position:absolute;z-index:10;
- right:24px;bottom:122px;
+#nitro{
+ position:absolute;
+ right:45px;bottom:132px;
+ width:86px;height:86px;
  border:0;border-radius:50%;
- width:82px;height:82px;
- background:linear-gradient(#ff8b21,#d52300);
- color:#fff;font-weight:900;
- box-shadow:0 0 22px rgba(255,75,0,.55);
+ background:linear-gradient(#ff8619,#e53200);
+ color:white;font-weight:bold;
+ font-size:16px;
+ box-shadow:0 0 25px #ff4d00aa;
+ z-index:31;
  touch-action:none
 }
 
+/* START */
 .start{
- position:absolute;z-index:20;inset:0;
- display:flex;align-items:center;
+ position:absolute;inset:0;
+ z-index:50;
+ display:flex;
+ align-items:center;
  justify-content:center;
- background:rgba(0,0,0,.38)
+ background:#0007
 }
 .panel{
- background:rgba(7,12,17,.9);
- color:#fff;padding:24px;
- border-radius:18px;text-align:center;
- border:1px solid rgba(255,255,255,.2);
- width:min(90%,340px)
+ width:88%;max-width:350px;
+ padding:25px;
+ text-align:center;
+ color:white;
+ border-radius:18px;
+ background:#071018eF;
+ border:1px solid #ffffff33
 }
-.panel h1{
- margin:0 0 8px;font-size:27px
+.panel h1{margin:0 0 10px}
+.panel p{color:#cbd4d9;font-size:14px}
+#startBtn{
+ border:0;
+ padding:14px 30px;
+ border-radius:12px;
+ background:#e53935;
+ color:white;
+ font-weight:bold;
+ font-size:18px
 }
-.panel p{
- color:#c9d3d9;font-size:13px
-}
-.startBtn{
- border:0;border-radius:12px;
- padding:13px 30px;
- background:#e53935;color:#fff;
- font-weight:900;font-size:18px
-}
-.hidden{display:none!important}
+.hide{display:none}
 </style>
 </head>
 
@@ -257,421 +292,337 @@ html,body{
 
 <div id="game">
 
-<div class="scene"></div>
-<div class="shade"></div>
-<div class="road"></div>
+<div class="mountains"></div>
 
-<div class="rail l"></div>
-<div class="rail r"></div>
-
-<div class="hud">
- <div class="box">
-  <small>SCORE</small>
-  <b id="score">0</b>
- </div>
-
- <div class="box">
-  <small>COINS</small>
-  <b id="coins">0</b>
- </div>
-
- <div class="box">
-  <small>LIVES</small>
-  <b id="lives">3</b>
- </div>
-
- <div class="box">
-  <small>BEST</small>
-  <b id="best">0</b>
- </div>
+<div class="road">
+ <div class="roadLine"></div>
 </div>
 
-<div class="center" id="speed">0 KM/H</div>
+<div class="rail left"></div>
+<div class="rail right"></div>
 
+<div class="hud">
+ <div class="stat"><small>SCORE</small><b id="score">0</b></div>
+ <div class="stat"><small>COINS</small><b id="coins">0</b></div>
+ <div class="stat"><small>LIVES</small><b id="lives">3</b></div>
+ <div class="stat"><small>BEST</small><b id="best">0</b></div>
+</div>
+
+<div class="speed" id="speed">105 KM/H</div>
+
+<!-- BIKE -->
 <div class="bike" id="bike">
  <div class="wheel front"></div>
  <div class="wheel back"></div>
+ <div class="rider"></div>
+ <div class="helmet"></div>
  <div class="handle"></div>
- <div class="head"></div>
- <div class="visor"></div>
  <div class="tail"></div>
  <div class="seat"></div>
- <div class="body"></div>
+ <div class="fairing"></div>
  <div class="light"></div>
 </div>
 
-<button class="nitro" id="nitro">NITRO</button>
+<button id="nitro">NITRO</button>
 
 <div class="controls">
- <button class="btn" id="left">‹</button>
- <button class="btn" id="right">›</button>
+ <button class="control" id="left">‹</button>
+ <button class="control" id="right">›</button>
 </div>
 
 <div class="start" id="start">
  <div class="panel">
   <h1>🏍️ Mountain Highway</h1>
   <p>
-   Realistic mountain-road bike racing.
-   Collect coins, avoid traffic and use Nitro.
+   Race through the mountains.<br>
+   Avoid traffic and collect coins.
   </p>
-  <button class="startBtn" id="startBtn">
-   START RACE
-  </button>
+  <button id="startBtn">START RACE</button>
  </div>
 </div>
 
 </div>
 
 <script>
+const game=document.getElementById("game");
+const bike=document.getElementById("bike");
 
-const bike = document.getElementById("bike");
-const scoreEl = document.getElementById("score");
-const coinsEl = document.getElementById("coins");
-const livesEl = document.getElementById("lives");
-const bestEl = document.getElementById("best");
-const speedEl = document.getElementById("speed");
+const scoreEl=document.getElementById("score");
+const coinsEl=document.getElementById("coins");
+const livesEl=document.getElementById("lives");
+const bestEl=document.getElementById("best");
+const speedEl=document.getElementById("speed");
 
-let x = 50;
-let score = 0;
-let coins = 0;
-let lives = 3;
-let best = +localStorage.mhrBest || 0;
+let running=false;
+let playerX=50;
+let score=0;
+let coins=0;
+let lives=3;
+let best=Number(localStorage.getItem("bikeBest")||0);
+let nitro=false;
 
-let running = false;
-let nitro = false;
-let last = 0;
-let spawn = 0;
-let coinSpawn = 0;
+let cars=[];
+let coinList=[];
 
-let cars = [];
-let coinObjs = [];
+let last=0;
+let carTimer=0;
+let coinTimer=0;
 
-bestEl.textContent = best;
+bestEl.textContent=best;
 
 function move(dir){
+ if(!running)return;
 
- if(!running) return;
+ playerX+=dir*5;
 
- x += dir * 5;
+ if(playerX<28)playerX=28;
+ if(playerX>72)playerX=72;
 
- x = Math.max(24, Math.min(76, x));
-
- bike.style.left = x + "%";
+ bike.style.left=playerX+"%";
 }
 
-function addCar(){
+function createCar(){
 
- const e = document.createElement("div");
+ const car=document.createElement("div");
+ car.className="car";
 
- e.className = "car";
+ const lanes=[35,50,65];
+ const lane=lanes[Math.floor(Math.random()*lanes.length)];
 
- const lanes = [34,50,66];
+ car.style.left=lane+"%";
+ car.style.top="-100px";
 
- const lane =
- lanes[Math.floor(Math.random()*lanes.length)];
-
- e.style.left = lane + "%";
- e.style.top = "18%";
-
- e.style.transform = "scale(.45)";
-
- document.getElementById("game").appendChild(e);
+ game.appendChild(car);
 
  cars.push({
-  e:e,
-  y:18,
-  lane:lane
+  el:car,
+  x:lane,
+  y:-100
  });
 }
 
-function addCoin(){
+function createCoin(){
 
- const e = document.createElement("div");
+ const coin=document.createElement("div");
+ coin.className="coin";
 
- e.className = "coin";
+ const lanes=[39,50,61];
+ const lane=lanes[Math.floor(Math.random()*lanes.length)];
 
- const lanes = [39,50,61];
+ coin.style.left=lane+"%";
+ coin.style.top="-30px";
 
- const lane =
- lanes[Math.floor(Math.random()*lanes.length)];
+ game.appendChild(coin);
 
- e.style.left = lane + "%";
- e.style.top = "24%";
-
- e.style.transform = "scale(.55)";
-
- document.getElementById("game").appendChild(e);
-
- coinObjs.push({
-  e:e,
-  y:24,
-  lane:lane
+ coinList.push({
+  el:coin,
+  x:lane,
+  y:-30
  });
 }
 
-function hit(a,b){
-
- return Math.abs(parseFloat(a)-parseFloat(b)) < 7;
+function collision(x1,y1,x2,y2){
+ return Math.abs(x1-x2)<8 &&
+        Math.abs(y1-y2)<75;
 }
 
-function loop(t){
+function gameLoop(time){
 
- if(!running) return;
+ if(!running)return;
 
- let dt = Math.min(
-  .035,
-  (t-last)/1000 || 0
- );
+ const dt=Math.min(.035,(time-last)/1000);
+ last=time;
 
- last = t;
+ const boost=nitro?1.8:1;
 
- let mult = nitro ? 1.75 : 1;
+ score+=dt*100*boost;
+ scoreEl.textContent=Math.floor(score);
 
- score += dt * 110 * mult;
+ speedEl.textContent=
+   Math.floor(105*boost)+" KM/H";
 
- scoreEl.textContent =
-  Math.floor(score);
+ carTimer-=dt*boost;
+ coinTimer-=dt*boost;
 
- speedEl.textContent =
-  Math.floor(105*mult) + " KM/H";
-
- spawn -= dt * mult;
- coinSpawn -= dt * mult;
-
- if(spawn <= 0){
-
-  addCar();
-
-  spawn = .85 +
-  Math.random()*.7;
+ if(carTimer<=0){
+  createCar();
+  carTimer=.75+Math.random()*.65;
  }
 
- if(coinSpawn <= 0){
-
-  addCoin();
-
-  coinSpawn = .65 +
-  Math.random()*.65;
+ if(coinTimer<=0){
+  createCoin();
+  coinTimer=.55+Math.random()*.55;
  }
 
- cars.forEach(o => {
+ cars.forEach(c=>{
 
-  o.y +=
-   dt*(18+Math.random()*2)*mult;
+  c.y+=dt*360*boost;
+  c.el.style.top=c.y+"px";
 
-  o.e.style.top =
-   o.y + "%";
+  const scale=.45+c.y/1000;
+  c.el.style.transform=
+    "translateX(-50%) scale("+scale+")";
 
-  o.e.style.transform =
-   "translateX(-50%) scale(" +
-   (0.45+o.y/120) + ")";
+  if(c.y>window.innerHeight*.60 &&
+     c.y<window.innerHeight*.95 &&
+     collision(c.x,playerX,c.y,window.innerHeight*.80)){
 
-  if(o.y > 70 && hit(o.lane,x)){
+    c.y=window.innerHeight+200;
+    lives--;
 
-   o.y = 120;
+    livesEl.textContent=lives;
 
-   lives--;
+    bike.animate(
+     [
+      {transform:"translateX(-50%) rotate(-9deg)"},
+      {transform:"translateX(-50%) rotate(9deg)"},
+      {transform:"translateX(-50%) rotate(0)"}
+     ],
+     {duration:300}
+    );
 
-   livesEl.textContent =
-    lives;
-
-   bike.animate(
-    [
-     {transform:"translateX(-50%) rotate(-8deg)"},
-     {transform:"translateX(-50%) rotate(8deg)"},
-     {transform:"translateX(-50%) rotate(0)"}
-    ],
-    {duration:300}
-   );
-
-   if(lives <= 0){
-
-    gameOver();
-   }
+    if(lives<=0){
+     endGame();
+    }
   }
-
  });
 
- cars = cars.filter(o => {
-
-  if(o.y > 110){
-
-   o.e.remove();
-
+ cars=cars.filter(c=>{
+  if(c.y>window.innerHeight+150){
+   c.el.remove();
    return false;
   }
-
   return true;
  });
 
- coinObjs.forEach(o => {
+ coinList.forEach(c=>{
 
-  o.y +=
-   dt*20*mult;
+  c.y+=dt*330*boost;
+  c.el.style.top=c.y+"px";
 
-  o.e.style.top =
-   o.y + "%";
+  const scale=.5+c.y/1000;
+  c.el.style.transform="scale("+scale+")";
 
-  o.e.style.transform =
-   "scale(" +
-   (0.55+o.y/140) +
-   ")";
+  if(c.y>window.innerHeight*.60 &&
+     c.y<window.innerHeight*.90 &&
+     Math.abs(c.x-playerX)<9){
 
-  if(o.y > 70 && hit(o.lane,x)){
+    coins++;
+    score+=250;
 
-   coins++;
+    coinsEl.textContent=coins;
 
-   coinsEl.textContent =
-    coins;
-
-   score += 250;
-
-   o.y = 120;
+    c.y=window.innerHeight+200;
   }
-
  });
 
- coinObjs = coinObjs.filter(o => {
-
-  if(o.y > 110){
-
-   o.e.remove();
-
+ coinList=coinList.filter(c=>{
+  if(c.y>window.innerHeight+100){
+   c.el.remove();
    return false;
   }
-
   return true;
  });
 
- requestAnimationFrame(loop);
+ requestAnimationFrame(gameLoop);
 }
 
-function start(){
+function startGame(){
 
- score = 0;
- coins = 0;
- lives = 3;
- x = 50;
+ score=0;
+ coins=0;
+ lives=3;
+ playerX=50;
 
- cars.forEach(o => o.e.remove());
- coinObjs.forEach(o => o.e.remove());
+ cars.forEach(c=>c.el.remove());
+ coinList.forEach(c=>c.el.remove());
 
- cars = [];
- coinObjs = [];
+ cars=[];
+ coinList=[];
 
- scoreEl.textContent = "0";
- coinsEl.textContent = "0";
- livesEl.textContent = "3";
+ scoreEl.textContent="0";
+ coinsEl.textContent="0";
+ livesEl.textContent="3";
 
- bike.style.left = "50%";
-
- running = true;
-
- document
-  .getElementById("start")
-  .classList.add("hidden");
-
- last = performance.now();
-
- requestAnimationFrame(loop);
-}
-
-function gameOver(){
-
- running = false;
-
- best =
-  Math.max(best,Math.floor(score));
-
- localStorage.mhrBest =
-  best;
-
- bestEl.textContent =
-  best;
-
- document.querySelector(".panel h1")
-  .textContent = "🏁 RACE OVER";
-
- document.querySelector(".panel p")
-  .textContent =
-   "Score: " +
-   Math.floor(score) +
-   " • Coins: " +
-   coins;
-
- document.getElementById("startBtn")
-  .textContent = "PLAY AGAIN";
+ bike.style.left="50%";
 
  document.getElementById("start")
-  .classList.remove("hidden");
+   .classList.add("hide");
+
+ running=true;
+ last=performance.now();
+
+ requestAnimationFrame(gameLoop);
 }
 
-document
- .getElementById("startBtn")
- .onclick = start;
+function endGame(){
 
-document
- .getElementById("left")
- .onpointerdown = () => move(-1);
+ running=false;
 
-document
- .getElementById("right")
- .onpointerdown = () => move(1);
+ best=Math.max(best,Math.floor(score));
 
-document
- .getElementById("nitro")
- .onpointerdown = () => {
-  nitro = true;
- };
+ localStorage.setItem("bikeBest",best);
 
-document
- .getElementById("nitro")
- .onpointerup = () => {
-  nitro = false;
- };
+ bestEl.textContent=best;
 
-document
- .getElementById("nitro")
- .onpointercancel = () => {
-  nitro = false;
- };
+ document.querySelector(".panel h1")
+   .textContent="🏁 GAME OVER";
 
-addEventListener("keydown",e => {
+ document.querySelector(".panel p")
+   .innerHTML=
+    "Score: "+Math.floor(score)+
+    "<br>Coins: "+coins;
 
- if(
-  e.key === "ArrowLeft" ||
-  e.key.toLowerCase() === "a"
- ){
+ document.getElementById("startBtn")
+   .textContent="PLAY AGAIN";
+
+ document.getElementById("start")
+   .classList.remove("hide");
+}
+
+/* MOBILE */
+document.getElementById("left")
+ .addEventListener("pointerdown",()=>move(-1));
+
+document.getElementById("right")
+ .addEventListener("pointerdown",()=>move(1));
+
+/* KEYBOARD */
+document.addEventListener("keydown",e=>{
+
+ if(e.key==="ArrowLeft" || e.key.toLowerCase()==="a")
   move(-1);
- }
 
- if(
-  e.key === "ArrowRight" ||
-  e.key.toLowerCase() === "d"
- ){
+ if(e.key==="ArrowRight" || e.key.toLowerCase()==="d")
   move(1);
- }
 
- if(
-  e.key === " " ||
-  e.key.toLowerCase() === "n"
- ){
-  nitro = true;
- }
-
+ if(e.code==="Space")
+  nitro=true;
 });
 
-addEventListener("keyup",e => {
-
- if(
-  e.key === " " ||
-  e.key.toLowerCase() === "n"
- ){
-  nitro = false;
- }
-
+document.addEventListener("keyup",e=>{
+ if(e.code==="Space")
+  nitro=false;
 });
 
+/* NITRO */
+const nitroBtn=document.getElementById("nitro");
+
+nitroBtn.addEventListener("pointerdown",()=>{
+ nitro=true;
+});
+
+nitroBtn.addEventListener("pointerup",()=>{
+ nitro=false;
+});
+
+nitroBtn.addEventListener("pointercancel",()=>{
+ nitro=false;
+});
+
+/* START */
+document.getElementById("startBtn")
+ .addEventListener("click",startGame);
 </script>
 
 </body>
