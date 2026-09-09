@@ -6,573 +6,151 @@
 <title>Mountain Bike Racing 3D</title>
 
 <style>
-*{
-  box-sizing:border-box;
-  -webkit-tap-highlight-color:transparent;
-}
-
+*{box-sizing:border-box}
 html,body{
-  margin:0;
-  width:100%;
-  height:100%;
-  overflow:hidden;
-  background:#91b8c5;
-  font-family:Arial,sans-serif;
-  touch-action:none;
+  margin:0;width:100%;height:100%;overflow:hidden;
+  background:#8fb8c7;font-family:Arial,sans-serif;
+  touch-action:none
 }
+#game{position:fixed;inset:0;overflow:hidden}
 
-#game{
-  position:relative;
-  width:100vw;
-  height:100vh;
-  overflow:hidden;
-}
-
-/* MOUNTAINS */
-#mountains{
+#scene{
   position:absolute;
-  inset:0;
-  background:
-  linear-gradient(
-    to bottom,
-    rgba(210,235,242,.08),
-    rgba(0,0,0,.18)
-  ),
-  url("https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Mountain_highway_%28Unsplash%29.jpg/1280px-Mountain_highway_%28Unsplash%29.jpg")
-  center center/cover no-repeat;
-  transform:scale(1.04);
+  inset:0
 }
 
-/* ROAD */
-#road{
-  position:absolute;
-  left:50%;
-  bottom:-4%;
-  width:66%;
-  height:79%;
-  transform:translateX(-50%);
-  background:
-  linear-gradient(
-    90deg,
-    #191e22 0%,
-    #3e4549 48%,
-    #252a2e 100%
-  );
-  clip-path:
-  polygon(
-    42% 0,
-    58% 0,
-    100% 100%,
-    0 100%
-  );
-  box-shadow:
-  0 0 40px rgba(0,0,0,.65);
-}
-
-/* ROAD EDGE */
-#road:before{
-  content:"";
-  position:absolute;
-  inset:0;
-  border-left:5px solid rgba(245,245,245,.8);
-  border-right:5px solid rgba(245,245,245,.55);
-  clip-path:polygon(
-    42% 0,
-    58% 0,
-    100% 100%,
-    0 100%
-  );
-}
-
-/* CENTER MARKINGS */
-#roadLine{
-  position:absolute;
-  left:50%;
-  top:0;
-  width:7px;
-  height:100%;
-  transform:translateX(-50%);
-  background:
-  repeating-linear-gradient(
-    to bottom,
-    #fff 0 42px,
-    transparent 42px 88px
-  );
-  filter:drop-shadow(0 0 3px #fff);
-}
-
-/* GUARD RAILS */
-.rail{
-  position:absolute;
-  bottom:27%;
-  width:58%;
-  height:7px;
-  background:linear-gradient(#fff,#999);
-  z-index:12;
-  box-shadow:0 2px 5px #000;
-}
-
-.rail.left{
-  left:-7%;
-  transform:rotate(-7deg);
-}
-
-.rail.right{
-  right:-7%;
-  transform:rotate(7deg);
-}
-
-.rail:after{
-  content:"";
-  position:absolute;
-  left:0;
-  right:0;
-  top:14px;
-  height:5px;
-  background:#777;
-}
-
-/* HUD */
 #hud{
   position:absolute;
-  top:17px;
-  left:14px;
-  right:14px;
+  top:14px;
+  left:12px;
+  right:12px;
+  z-index:20;
   display:grid;
   grid-template-columns:repeat(4,1fr);
-  gap:8px;
-  z-index:80;
+  gap:7px
 }
 
-.card{
-  background:rgba(10,27,38,.91);
-  border:1px solid rgba(255,255,255,.38);
-  border-radius:15px;
-  padding:8px 2px;
+.h{
+  background:rgba(8,25,36,.92);
+  border:1px solid #ffffff55;
+  border-radius:14px;
+  color:white;
   text-align:center;
-  color:#fff;
-  box-shadow:0 5px 15px rgba(0,0,0,.55);
+  padding:7px 2px;
+  box-shadow:0 4px 12px #0008
 }
 
-.card span{
+.h small{
   display:block;
-  font-size:11px;
-  color:#b9c7cd;
+  color:#bdc9cf;
+  font-size:10px
 }
 
-.card strong{
-  display:block;
-  font-size:25px;
-  margin-top:2px;
+.h b{
+  font-size:24px
 }
 
 #speed{
   position:absolute;
-  top:142px;
+  top:137px;
   width:100%;
+  z-index:20;
   text-align:center;
-  color:#fff;
+  color:white;
   font-size:34px;
   font-weight:900;
-  letter-spacing:1px;
-  text-shadow:
-  0 3px 5px #000,
-  0 0 10px #555;
-  z-index:80;
+  text-shadow:0 3px 8px #000
 }
 
-/* GAME OBJECTS */
-#objects{
-  position:absolute;
-  inset:0;
-  z-index:35;
-  pointer-events:none;
-}
-
-/* TRAFFIC */
-.car{
-  position:absolute;
-  width:54px;
-  height:91px;
-  border-radius:13px 13px 9px 9px;
-  background:
-    linear-gradient(
-      90deg,
-      #17191b,
-      #777e82 48%,
-      #1a1c1e
-    );
-  border:2px solid #111;
-  box-shadow:
-  0 12px 20px rgba(0,0,0,.75);
-}
-
-.car:before{
-  content:"";
-  position:absolute;
-  left:7px;
-  right:7px;
-  top:13px;
-  height:31px;
-  border-radius:8px;
-  background:
-    linear-gradient(
-      #a8d5df,
-      #24383f
-    );
-  border:2px solid #111;
-}
-
-.car:after{
-  content:"";
-  position:absolute;
-  left:9px;
-  right:9px;
-  bottom:8px;
-  height:11px;
-  border-radius:4px;
-  background:
-  linear-gradient(
-    90deg,
-    #ff1010 0 33%,
-    transparent 33% 67%,
-    #ff1010 67%
-  );
-  box-shadow:0 0 9px red;
-}
-
-/* COIN */
-.coin{
-  position:absolute;
-  width:30px;
-  height:30px;
-  border-radius:50%;
-  background:
-  radial-gradient(
-    circle,
-    #fffbd0 0 18%,
-    #ffe01c 25% 62%,
-    #ff8a00 68%
-  );
-  border:4px solid #ffae00;
-  box-shadow:
-  0 0 8px #ffd000,
-  0 0 22px #ff8a00;
-}
-
-/* BIKE */
-#bike{
-  position:absolute;
-  left:50%;
-  bottom:122px;
-  width:150px;
-  height:260px;
-  transform:translateX(-50%);
-  z-index:60;
-  filter:
-    drop-shadow(0 16px 10px rgba(0,0,0,.8));
-}
-
-/* WHEELS */
-.wheel{
-  position:absolute;
-  left:50%;
-  width:43px;
-  height:76px;
-  transform:translateX(-50%);
-  border-radius:50%;
-  background:
-    radial-gradient(
-      circle,
-      #aaa 0 9%,
-      #111 11% 40%,
-      #555 42% 49%,
-      #050505 51%
-    );
-  border:5px solid #111;
-}
-
-.frontWheel{
-  top:0;
-}
-
-.backWheel{
-  bottom:0;
-}
-
-/* FRONT FORK */
-.fork{
-  position:absolute;
-  left:50%;
-  top:44px;
-  width:9px;
-  height:90px;
-  transform:
-    translateX(-50%)
-    rotate(7deg);
-  background:
-    linear-gradient(
-      90deg,
-      #ccc,
-      #555
-    );
-  border-radius:8px;
-}
-
-/* RIDER BODY */
-.riderBody{
-  position:absolute;
-  left:50%;
-  top:34px;
-  width:47px;
-  height:72px;
-  transform:translateX(-50%);
-  background:
-    linear-gradient(
-      90deg,
-      #15191d,
-      #323940,
-      #11151a
-    );
-  border-radius:20px 20px 12px 12px;
-  box-shadow:0 5px 8px #0008;
-}
-
-/* RIDER HELMET */
-.helmet{
-  position:absolute;
-  left:50%;
-  top:5px;
-  width:32px;
-  height:34px;
-  transform:translateX(-50%);
-  background:
-    radial-gradient(
-      circle at 35% 25%,
-      #56636c,
-      #111820 62%
-    );
-  border-radius:50% 50% 43% 43%;
-  border:2px solid #080b0e;
-}
-
-/* HELMET VISOR */
-.helmet:after{
-  content:"";
-  position:absolute;
-  left:3px;
-  top:12px;
-  width:25px;
-  height:9px;
-  border-radius:8px;
-  background:#7ba0ad;
-  box-shadow:inset 0 0 5px #000;
-}
-
-/* ARMS */
-.arm{
-  position:absolute;
-  top:47px;
-  width:55px;
-  height:9px;
-  background:#171b1f;
-  border-radius:8px;
-}
-
-.arm.left{
-  left:18px;
-  transform:rotate(-25deg);
-}
-
-.arm.right{
-  right:18px;
-  transform:rotate(25deg);
-}
-
-/* HANDLE */
-.handle{
-  position:absolute;
-  left:50%;
-  top:69px;
-  width:91px;
-  height:8px;
-  transform:translateX(-50%);
-  background:#101214;
-  border-radius:8px;
-}
-
-/* TANK */
-.tank{
-  position:absolute;
-  left:50%;
-  top:78px;
-  width:90px;
-  height:72px;
-  transform:translateX(-50%);
-  background:
-    linear-gradient(
-      105deg,
-      #76000c,
-      #ff1637 48%,
-      #81000e
-    );
-  border-radius:44px 44px 18px 18px;
-  box-shadow:
-    inset -10px -7px 14px #430005,
-    inset 8px 0 9px #ff5c6a;
-}
-
-/* BIKE BODY */
-.body{
-  position:absolute;
-  left:50%;
-  top:123px;
-  width:78px;
-  height:91px;
-  transform:translateX(-50%);
-  background:
-    linear-gradient(
-      100deg,
-      #83000f,
-      #ff1738 48%,
-      #85000f
-    );
-  border-radius:28px 28px 19px 19px;
-  box-shadow:
-    inset -10px 0 13px #4b0007;
-}
-
-/* HEADLIGHT */
-.light{
-  position:absolute;
-  left:50%;
-  top:126px;
-  width:26px;
-  height:14px;
-  transform:translateX(-50%);
-  background:#fff7a1;
-  border-radius:50%;
-  box-shadow:0 0 15px #fff;
-}
-
-/* EXHAUST */
-.exhaust{
-  position:absolute;
-  right:24px;
-  top:164px;
-  width:37px;
-  height:10px;
-  background:linear-gradient(#aaa,#222);
-  border-radius:8px;
-}
-
-/* NITRO */
 #nitro{
   position:absolute;
-  right:27px;
-  bottom:198px;
-  width:118px;
-  height:63px;
-  border:2px solid #ffbf70;
+  right:22px;
+  bottom:184px;
+  width:120px;
+  height:64px;
+  border:2px solid #ffbd6b;
   border-radius:20px;
-  background:
-    linear-gradient(
-      #ff9f1c,
-      #ef4b00
-    );
-  color:#fff;
+  background:linear-gradient(#ff9c16,#ed4a00);
+  color:white;
   font-size:19px;
   font-weight:900;
-  z-index:90;
-  box-shadow:0 5px 15px #0008;
+  z-index:30;
+  box-shadow:0 5px 14px #0009
 }
 
-#nitroBar{
+#bar{
   position:absolute;
-  right:27px;
-  bottom:184px;
-  width:118px;
+  right:22px;
+  bottom:173px;
+  width:120px;
   height:8px;
-  background:#222;
-  border-radius:20px;
-  z-index:90;
+  border-radius:8px;
+  background:#202020;
   overflow:hidden;
+  z-index:30
 }
 
-#nitroFill{
+#fill{
   height:100%;
   width:100%;
-  background:
-    linear-gradient(
-      90deg,
-      #ff5b00,
-      #ffd000
-    );
+  background:linear-gradient(90deg,#ff4d00,#ffd000)
 }
 
-/* CONTROLS */
 #controls{
   position:absolute;
   left:0;
   right:0;
-  bottom:21px;
+  bottom:18px;
+  z-index:30;
   display:flex;
   justify-content:space-between;
-  padding:0 27px;
-  z-index:90;
+  padding:0 25px
 }
 
-.control{
-  width:112px;
-  height:112px;
+.c{
+  width:108px;
+  height:108px;
   border-radius:50%;
-  border:3px solid #fff;
-  background:rgba(7,22,33,.91);
-  color:#fff;
-  font-size:66px;
-  line-height:94px;
-  text-align:center;
+  border:3px solid white;
+  background:#071827e8;
+  color:white;
+  font-size:64px;
+  line-height:92px;
+  text-align:center
 }
 
-.control:active,
-#nitro:active{
-  transform:scale(.94);
+#loading{
+  position:absolute;
+  inset:0;
+  z-index:100;
+  background:#0c1820;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:white;
+  font-size:20px;
+  text-align:center
 }
 
-/* GAME OVER */
-#gameOver{
+#msg{
   display:none;
   position:absolute;
   inset:0;
-  z-index:200;
-  background:rgba(0,0,0,.75);
-  color:#fff;
+  z-index:100;
+  background:#000b;
+  color:white;
   text-align:center;
-  padding-top:42vh;
-  font-size:32px;
-  font-weight:900;
+  padding-top:40vh;
+  font-size:31px;
+  font-weight:900
 }
 
-#gameOver small{
-  font-size:15px;
+#msg small{
+  font-size:14px
 }
 
 @media(max-width:430px){
-  #hud{
-    gap:7px;
-  }
-
-  .card{
-    padding:8px 1px;
-  }
-
-  .card strong{
-    font-size:24px;
-  }
-
-  #speed{
-    font-size:34px;
-  }
+  .h b{font-size:23px}
 }
 </style>
 </head>
@@ -581,800 +159,1309 @@ html,body{
 
 <div id="game">
 
-  <div id="mountains"></div>
+<div id="scene"></div>
 
-  <div id="road">
-    <div id="roadLine"></div>
-  </div>
+<div id="hud">
 
-  <div class="rail left"></div>
-  <div class="rail right"></div>
+<div class="h">
+<small>SCORE</small>
+<b id="score">0</b>
+</div>
 
-  <!-- HUD -->
-  <div id="hud">
+<div class="h">
+<small>COINS</small>
+<b id="coins">0</b>
+</div>
 
-    <div class="card">
-      <span>SCORE</span>
-      <strong id="score">0</strong>
-    </div>
+<div class="h">
+<small>LIVES</small>
+<b id="lives">3</b>
+</div>
 
-    <div class="card">
-      <span>COINS</span>
-      <strong id="coins">0</strong>
-    </div>
-
-    <div class="card">
-      <span>LIVES</span>
-      <strong id="lives">3</strong>
-    </div>
-
-    <div class="card">
-      <span>BEST</span>
-      <strong id="best">0</strong>
-    </div>
-
-  </div>
-
-  <div id="speed">100 KM/H</div>
-
-  <!-- TRAFFIC + COINS -->
-  <div id="objects"></div>
-
-  <!-- BIKE -->
-  <div id="bike">
-
-    <div class="wheel frontWheel"></div>
-
-    <div class="wheel backWheel"></div>
-
-    <div class="fork"></div>
-
-    <div class="helmet"></div>
-
-    <div class="riderBody"></div>
-
-    <div class="arm left"></div>
-    <div class="arm right"></div>
-
-    <div class="handle"></div>
-
-    <div class="tank"></div>
-
-    <div class="body"></div>
-
-    <div class="light"></div>
-
-    <div class="exhaust"></div>
-
-  </div>
-
-  <!-- NITRO -->
-  <button id="nitro">NITRO</button>
-
-  <div id="nitroBar">
-    <div id="nitroFill"></div>
-  </div>
-
-  <!-- CONTROLS -->
-  <div id="controls">
-
-    <button id="left" class="control">‹</button>
-
-    <button id="right" class="control">›</button>
-
-  </div>
-
-  <div id="gameOver">
-    GAME OVER
-    <br>
-    <small>Tap screen to restart</small>
-  </div>
+<div class="h">
+<small>BEST</small>
+<b id="best">0</b>
+</div>
 
 </div>
 
-<script>
-(() => {
+<div id="speed">100 KM/H</div>
 
-const $ = id => document.getElementById(id);
+<button id="nitro">NITRO</button>
 
-const objects = $("objects");
+<div id="bar">
+<div id="fill"></div>
+</div>
 
-const scoreEl = $("score");
-const coinsEl = $("coins");
-const livesEl = $("lives");
-const bestEl = $("best");
-const speedEl = $("speed");
-const nitroFill = $("nitroFill");
-const gameOver = $("gameOver");
+<div id="controls">
 
-let score = 0;
-let coins = 0;
-let lives = 3;
-let nitro = 100;
+<button class="c" id="left">‹</button>
 
-let playerX = 50;
+<button class="c" id="right">›</button>
 
-let direction = 0;
-let boosting = false;
-let ended = false;
+</div>
+
+<div id="loading">
+Loading 3D Bike...
+</div>
+
+<div id="msg">
+GAME OVER
+<br>
+<small>Tap screen to restart</small>
+</div>
+
+</div>
+
+<script type="module">
+
+import * as THREE from
+"https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.js";
+
+import {GLTFLoader} from
+"https://cdn.jsdelivr.net/npm/three@0.179.1/examples/jsm/loaders/GLTFLoader.js";
+
+import {DRACOLoader} from
+"https://cdn.jsdelivr.net/npm/three@0.179.1/examples/jsm/loaders/DRACOLoader.js";
+
+
+/* =========================
+   THREE.JS
+========================= */
+
+const scene =
+new THREE.Scene();
+
+scene.fog =
+new THREE.Fog(
+  0x9bbbc4,
+  35,
+  260
+);
+
+
+const camera =
+new THREE.PerspectiveCamera(
+  58,
+  innerWidth/innerHeight,
+  .05,
+  500
+);
+
+camera.position.set(
+  0,
+  4.1,
+  9.5
+);
+
+
+const renderer =
+new THREE.WebGLRenderer({
+  antialias:true
+});
+
+renderer.setPixelRatio(
+  Math.min(devicePixelRatio,1.7)
+);
+
+renderer.setSize(
+  innerWidth,
+  innerHeight
+);
+
+renderer.outputColorSpace =
+THREE.SRGBColorSpace;
+
+renderer.shadowMap.enabled=true;
+
+document
+.getElementById("scene")
+.appendChild(renderer.domElement);
+
+
+/* LIGHT */
+
+scene.background =
+new THREE.Color(0x9bbbc4);
+
+const hemi =
+new THREE.HemisphereLight(
+  0xeaf8ff,
+  0x4b5541,
+  2
+);
+
+scene.add(hemi);
+
+
+const sun =
+new THREE.DirectionalLight(
+  0xfff1d2,
+  3
+);
+
+sun.position.set(
+  -35,
+  55,
+  25
+);
+
+sun.castShadow=true;
+
+scene.add(sun);
+
+
+/* =========================
+   MOUNTAIN BACKGROUND
+========================= */
+
+const textureLoader =
+new THREE.TextureLoader();
+
+textureLoader.load(
+"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Mountain_highway_%28Unsplash%29.jpg/1280px-Mountain_highway_%28Unsplash%29.jpg",
+
+texture=>{
+
+texture.colorSpace =
+THREE.SRGBColorSpace;
+
+const geometry =
+new THREE.SphereGeometry(
+  170,
+  48,
+  24
+);
+
+geometry.scale(
+  -1,
+  1,
+  1
+);
+
+const material =
+new THREE.MeshBasicMaterial({
+  map:texture
+});
+
+const sky =
+new THREE.Mesh(
+  geometry,
+  material
+);
+
+scene.add(sky);
+
+}
+);
+
+
+/* =========================
+   ROAD
+========================= */
+
+const road =
+new THREE.Mesh(
+  new THREE.PlaneGeometry(
+    15,
+    700
+  ),
+  new THREE.MeshStandardMaterial({
+    color:0x30363a,
+    roughness:.92
+  })
+);
+
+road.rotation.x =
+-Math.PI/2;
+
+road.position.y =
+-.04;
+
+scene.add(road);
+
+
+/* GRASS */
+
+const grassMaterial =
+new THREE.MeshStandardMaterial({
+  color:0x405a3a,
+  roughness:1
+});
+
+const grass1 =
+new THREE.Mesh(
+  new THREE.PlaneGeometry(
+    80,
+    700
+  ),
+  grassMaterial
+);
+
+grass1.rotation.x =
+-Math.PI/2;
+
+grass1.position.set(
+  -47,
+  0,
+  -250
+);
+
+scene.add(grass1);
+
+
+const grass2 =
+grass1.clone();
+
+grass2.position.x=47;
+
+scene.add(grass2);
+
+
+/* ROAD LINES */
+
+const lineMaterial =
+new THREE.MeshBasicMaterial({
+  color:0xffffff
+});
+
+for(
+let z=-320;
+z<40;
+z+=10
+){
+
+const line =
+new THREE.Mesh(
+  new THREE.BoxGeometry(
+    .18,
+    .025,
+    4.2
+  ),
+  lineMaterial
+);
+
+line.position.set(
+  0,
+  .015,
+  z
+);
+
+scene.add(line);
+
+}
+
+
+/* =========================
+   GUARD RAILS
+========================= */
+
+const railMaterial =
+new THREE.MeshStandardMaterial({
+  color:0xbcc2c3,
+  metalness:.7,
+  roughness:.35
+});
+
+for(
+const x of [-8.2,8.2]
+){
+
+const rail =
+new THREE.Mesh(
+  new THREE.CylinderGeometry(
+    .08,
+    .08,
+    680,
+    8
+  ),
+  railMaterial
+);
+
+rail.rotation.x =
+Math.PI/2;
+
+rail.position.set(
+  x,
+  1,
+  -300
+);
+
+scene.add(rail);
+
+
+for(
+let z=-330;
+z<30;
+z+=12
+){
+
+const post =
+new THREE.Mesh(
+  new THREE.CylinderGeometry(
+    .06,
+    .06,
+    1.7,
+    7
+  ),
+  railMaterial
+);
+
+post.position.set(
+  x,
+  .45,
+  z
+);
+
+scene.add(post);
+
+}
+
+}
+
+
+/* =========================
+   ROCKS
+========================= */
+
+const rockMaterial =
+new THREE.MeshStandardMaterial({
+  color:0x5d6650,
+  roughness:1
+});
+
+for(
+let i=0;
+i<80;
+i++
+){
+
+const side =
+i%2 ? -1 : 1;
+
+const rock =
+new THREE.Mesh(
+  new THREE.DodecahedronGeometry(
+    .7+Math.random()*2.2
+  ),
+  rockMaterial
+);
+
+rock.position.set(
+  side*(10+Math.random()*14),
+  .5,
+  -20-i*7
+);
+
+rock.scale.y =
+1.3+Math.random()*2;
+
+scene.add(rock);
+
+}
+
+
+/* =========================
+   3D BIKE
+========================= */
+
+const loader =
+new GLTFLoader();
+
+const draco =
+new DRACOLoader();
+
+draco.setDecoderPath(
+"https://cdn.jsdelivr.net/npm/three@0.179.1/examples/jsm/libs/draco/"
+);
+
+loader.setDRACOLoader(draco);
+
+
+const bike =
+new THREE.Group();
+
+bike.position.set(
+  0,
+  .05,
+  5
+);
+
+scene.add(bike);
+
+
+function fitModel(
+model,
+height
+){
+
+const box =
+new THREE.Box3()
+.setFromObject(model);
+
+const size =
+box.getSize(
+  new THREE.Vector3()
+);
+
+const scale =
+height /
+Math.max(
+  size.y,
+  .001
+);
+
+model.scale.setScalar(
+  scale
+);
+
+model.traverse(
+object=>{
+
+if(object.isMesh){
+
+object.castShadow=true;
+object.receiveShadow=true;
+
+}
+
+}
+);
+
+}
+
+
+/* BIKE MODEL */
+
+loader.load(
+
+"https://raw.githubusercontent.com/Vyom-26/Dune_racer/main/public/assets/mesh/bike.glb",
+
+g=>{
+
+const model =
+g.scene;
+
+fitModel(
+  model,
+  2.05
+);
+
+model.rotation.y =
+Math.PI;
+
+bike.add(model);
+
+document
+.getElementById("loading")
+.style.display="none";
+
+},
+
+undefined,
+
+()=>{
+
+document
+.getElementById("loading")
+.innerHTML=
+"3D bike load nahi hui.<br>Internet check karke refresh karein.";
+
+}
+
+);
+
+
+/* RIDER */
+
+loader.load(
+
+"https://raw.githubusercontent.com/Vyom-26/Dune_racer/main/public/assets/mesh/rider_bike.glb",
+
+g=>{
+
+const rider =
+g.scene;
+
+fitModel(
+  rider,
+  2
+);
+
+rider.rotation.y =
+Math.PI;
+
+rider.position.set(
+  0,
+  .48,
+  .02
+);
+
+bike.add(rider);
+
+}
+
+);
+
+
+/* =========================
+   TRAFFIC CARS
+========================= */
+
+const traffic=[];
+
+
+function createCar(
+z,
+lane
+){
+
+const car =
+new THREE.Group();
+
+
+const colors=[
+  0x17242d,
+  0x9b1b1b,
+  0xd8d8d8,
+  0x263b68
+];
+
+
+const body =
+new THREE.Mesh(
+  new THREE.BoxGeometry(
+    1.45,
+    .72,
+    2.4
+  ),
+  new THREE.MeshStandardMaterial({
+    color:
+    colors[
+      Math.floor(
+        Math.random()*colors.length
+      )
+    ],
+    roughness:.45,
+    metalness:.2
+  })
+);
+
+body.position.y=.45;
+
+car.add(body);
+
+
+const glass =
+new THREE.Mesh(
+  new THREE.BoxGeometry(
+    1.1,
+    .34,
+    .8
+  ),
+  new THREE.MeshStandardMaterial({
+    color:0x5e8a99,
+    roughness:.15
+  })
+);
+
+glass.position.set(
+  0,
+  .85,
+  .18
+);
+
+car.add(glass);
+
+
+/* WHEELS */
+
+for(
+const x of [-.58,.58]
+){
+
+for(
+const zz of [-.78,.78]
+){
+
+const wheel =
+new THREE.Mesh(
+  new THREE.CylinderGeometry(
+    .22,
+    .22,
+    .16,
+    16
+  ),
+  new THREE.MeshStandardMaterial({
+    color:0x111111
+  })
+);
+
+wheel.rotation.z =
+Math.PI/2;
+
+wheel.position.set(
+  x,
+  .23,
+  zz
+);
+
+car.add(wheel);
+
+}
+
+}
+
+
+car.position.set(
+  lane*3,
+  .02,
+  z
+);
+
+scene.add(car);
+
+traffic.push({
+  object:car,
+  z:z,
+  lane:lane,
+  speed:8+Math.random()*5
+});
+
+}
+
+
+for(
+let i=0;
+i<5;
+i++
+){
+
+createCar(
+  -35-i*45,
+  [-1,-.35,.35,1][i%4]
+);
+
+}
+
+
+/* =========================
+   COINS
+========================= */
+
+const coinMaterial =
+new THREE.MeshStandardMaterial({
+  color:0xffc400,
+  emissive:0xff8a00,
+  emissiveIntensity:1.7,
+  metalness:.65,
+  roughness:.2
+});
+
+const coinGeometry =
+new THREE.TorusGeometry(
+  .28,
+  .09,
+  12,
+  24
+);
+
+const coins3D=[];
+
+
+for(
+let i=0;
+i<12;
+i++
+){
+
+const coin =
+new THREE.Mesh(
+  coinGeometry,
+  coinMaterial
+);
+
+coin.position.set(
+  (i%3-1)*2.2,
+  .75,
+  -18-i*18
+);
+
+coin.rotation.x =
+Math.PI/2;
+
+scene.add(coin);
+
+coins3D.push(coin);
+
+}
+
+
+/* =========================
+   GAME VARIABLES
+========================= */
+
+let score=0;
+let coinCount=0;
+let lives=3;
+let nitro=100;
+
+let steering=0;
+let boosting=false;
+let gameOver=false;
 
 let best =
-Number(localStorage.getItem("mountainBest") || 0);
+Number(
+  localStorage.getItem(
+    "mountainBikeBest"
+  ) || 0
+);
 
-let lastTime = performance.now();
-
-let trafficTimer = 0;
-let coinTimer = 0;
-
-let items = [];
+let last =
+performance.now();
 
 
 /* HUD */
 
+const scoreEl =
+document.getElementById("score");
+
+const coinsEl =
+document.getElementById("coins");
+
+const livesEl =
+document.getElementById("lives");
+
+const bestEl =
+document.getElementById("best");
+
+const speedEl =
+document.getElementById("speed");
+
+const fill =
+document.getElementById("fill");
+
+
 function updateHUD(){
 
-  scoreEl.textContent =
-    Math.floor(score);
+scoreEl.textContent =
+Math.floor(score);
 
-  coinsEl.textContent =
-    coins;
+coinsEl.textContent =
+coinCount;
 
-  livesEl.textContent =
-    lives;
+livesEl.textContent =
+lives;
 
-  bestEl.textContent =
-    best;
+bestEl.textContent =
+best;
 
-  const currentSpeed =
-    boosting && nitro > 0
-    ? 190
-    : 100;
+speedEl.textContent =
+(
+boosting && nitro>0
+? 190
+: 100
+)
++" KM/H";
 
-  speedEl.textContent =
-    currentSpeed + " KM/H";
-
-  nitroFill.style.width =
-    Math.max(0,nitro) + "%";
-}
-
-
-/* CREATE OBJECT */
-
-function createObject(type){
-
-  const element =
-    document.createElement("div");
-
-  element.className = type;
-
-  objects.appendChild(element);
-
-  items.push({
-
-    element:element,
-
-    type:type,
-
-    progress:0,
-
-    lane:
-      (Math.random() - .5) * 1.25,
-
-    hit:false
-
-  });
+fill.style.width =
+Math.max(
+  0,
+  nitro
+)
++"%";
 
 }
 
 
 /* GAME OVER */
 
-function finishGame(){
+function finish(){
 
-  ended = true;
+gameOver=true;
 
-  best =
-    Math.max(
-      best,
-      Math.floor(score)
-    );
-
-  localStorage.setItem(
-    "mountainBest",
-    best
-  );
-
-  gameOver.style.display =
-    "block";
-
-  updateHUD();
-
-}
-
-
-/* RESTART */
-
-function restartGame(){
-
-  for(let i=0;i<items.length;i++){
-
-    items[i].element.remove();
-
-  }
-
-  items = [];
-
-  score = 0;
-  coins = 0;
-  lives = 3;
-  nitro = 100;
-
-  playerX = 50;
-
-  direction = 0;
-  boosting = false;
-  ended = false;
-
-  gameOver.style.display =
-    "none";
-
-  updateHUD();
-
-}
-
-
-/* UPDATE GAME */
-
-function update(dt){
-
-  if(ended) return;
-
-
-  const multiplier =
-    boosting && nitro > 0
-    ? 1.85
-    : 1;
-
-
-  /* NITRO */
-
-  if(
-    boosting &&
-    nitro > 0
-  ){
-
-    nitro -=
-      40 * dt;
-
-  }else{
-
-    nitro =
-      Math.min(
-        100,
-        nitro + 8 * dt
-      );
-
-  }
-
-
-  /* STEERING */
-
-  playerX +=
-    direction * 38 * dt;
-
-  playerX =
-    Math.max(
-      28,
-      Math.min(72,playerX)
-    );
-
-
-  /* SCORE */
-
-  score +=
-    dt * 16 * multiplier;
-
-
-  trafficTimer += dt;
-  coinTimer += dt;
-
-
-  /* TRAFFIC */
-
-  if(
-    trafficTimer >
-    .85 / multiplier
-  ){
-
-    trafficTimer = 0;
-
-    createObject("car");
-
-  }
-
-
-  /* COINS */
-
-  if(
-    coinTimer >
-    .65
-  ){
-
-    coinTimer = 0;
-
-    createObject("coin");
-
-  }
-
-
-  /*
-    BACKWARDS LOOP
-    avoids array-splice bugs
-  */
-
-  for(
-    let i=items.length-1;
-    i>=0;
-    i--
-  ){
-
-    const item =
-      items[i];
-
-    item.progress +=
-      dt *
-      (.25 + .27 * multiplier);
-
-
-    const p =
-      item.progress;
-
-
-    /*
-      PERSPECTIVE
-      objects start tiny
-      and grow toward player
-    */
-
-    const y =
-      19 + p * 77;
-
-
-    const roadWidth =
-      3 + p * 29;
-
-
-    const objectX =
-      50 +
-      item.lane *
-      roadWidth;
-
-
-    const scale =
-      .20 + p * 1.22;
-
-
-    item.element.style.left =
-      objectX + "%";
-
-    item.element.style.top =
-      y + "%";
-
-    item.element.style.transform =
-      "translate(-50%,-50%) scale(" +
-      scale +
-      ")";
-
-
-    /* COLLISION */
-
-    if(
-      p > .89 &&
-      !item.hit &&
-      Math.abs(
-        objectX - playerX
-      ) < 7
-    ){
-
-      item.hit = true;
-
-
-      /* COIN */
-
-      if(
-        item.type === "coin"
-      ){
-
-        coins++;
-
-        score += 100;
-
-        nitro =
-          Math.min(
-            100,
-            nitro + 12
-          );
-
-        item.element.remove();
-
-        items.splice(i,1);
-
-        continue;
-
-      }
-
-
-      /* CAR */
-
-      if(
-        item.type === "car"
-      ){
-
-        lives--;
-
-        score =
-          Math.max(
-            0,
-            score - 90
-          );
-
-        item.element.style.opacity =
-          ".15";
-
-
-        if(
-          lives <= 0
-        ){
-
-          finishGame();
-
-        }
-
-      }
-
-    }
-
-
-    /* REMOVE OLD OBJECT */
-
-    if(
-      p > 1.08
-    ){
-
-      item.element.remove();
-
-      items.splice(i,1);
-
-    }
-
-  }
-
-
-  /* BEST SCORE */
-
-  if(
-    Math.floor(score) > best
-  ){
-
-    best =
-      Math.floor(score);
-
-    localStorage.setItem(
-      "mountainBest",
-      best
-    );
-
-  }
-
-
-  updateHUD();
-
-}
-
-
-/* GAME LOOP */
-
-function gameLoop(now){
-
-  const dt =
-    Math.min(
-      .035,
-      (now - lastTime) / 1000
-    );
-
-  lastTime = now;
-
-  update(dt);
-
-  requestAnimationFrame(
-    gameLoop
-  );
-
-}
-
-
-/* BUTTON CONTROL */
-
-function holdButton(
-  button,
-  value
-){
-
-  button.addEventListener(
-    "pointerdown",
-    event => {
-
-      event.preventDefault();
-
-      direction = value;
-
-    }
-  );
-
-
-  button.addEventListener(
-    "pointerup",
-    event => {
-
-      event.preventDefault();
-
-      if(
-        direction === value
-      ){
-
-        direction = 0;
-
-      }
-
-    }
-  );
-
-
-  button.addEventListener(
-    "pointercancel",
-    () => {
-
-      if(
-        direction === value
-      ){
-
-        direction = 0;
-
-      }
-
-    }
-  );
-
-
-  button.addEventListener(
-    "pointerleave",
-    () => {
-
-      if(
-        direction === value
-      ){
-
-        direction = 0;
-
-      }
-
-    }
-  );
-
-}
-
-
-holdButton(
-  $("left"),
-  -1
+best=Math.max(
+  best,
+  Math.floor(score)
 );
 
-holdButton(
-  $("right"),
-  1
+localStorage.setItem(
+  "mountainBikeBest",
+  best
+);
+
+document
+.getElementById("msg")
+.style.display="block";
+
+}
+
+
+/* =========================
+   CONTROLS
+========================= */
+
+function buttonHold(
+id,
+value
+){
+
+const button =
+document.getElementById(id);
+
+button.addEventListener(
+"pointerdown",
+e=>{
+
+e.preventDefault();
+
+steering=value;
+
+}
+);
+
+[
+"pointerup",
+"pointercancel",
+"pointerleave"
+]
+.forEach(
+event=>{
+
+button.addEventListener(
+event,
+()=>{
+
+if(
+  steering===value
+){
+
+steering=0;
+
+}
+
+}
+);
+
+});
+
+}
+
+
+buttonHold(
+"left",
+-1
+);
+
+buttonHold(
+"right",
+1
 );
 
 
 /* NITRO */
 
 const nitroButton =
-  $("nitro");
-
-nitroButton.addEventListener(
-  "pointerdown",
-  event => {
-
-    event.preventDefault();
-
-    boosting = true;
-
-  }
+document.getElementById(
+  "nitro"
 );
 
-nitroButton.addEventListener(
-  "pointerup",
-  () => {
-
-    boosting = false;
-
-  }
-);
 
 nitroButton.addEventListener(
-  "pointercancel",
-  () => {
+"pointerdown",
+e=>{
 
-    boosting = false;
+e.preventDefault();
 
-  }
+boosting=true;
+
+}
 );
+
+
+[
+"pointerup",
+"pointercancel",
+"pointerleave"
+]
+.forEach(
+event=>{
 
 nitroButton.addEventListener(
-  "pointerleave",
-  () => {
-
-    boosting = false;
-
-  }
+event,
+()=>boosting=false
 );
+
+});
 
 
 /* KEYBOARD */
 
 window.addEventListener(
-  "keydown",
-  event => {
+"keydown",
+e=>{
 
-    if(
-      event.key === "ArrowLeft" ||
-      event.key.toLowerCase() === "a"
-    ){
+if(
+e.key==="ArrowLeft" ||
+e.key.toLowerCase()==="a"
+){
 
-      direction = -1;
+steering=-1;
 
-    }
+}
 
+if(
+e.key==="ArrowRight" ||
+e.key.toLowerCase()==="d"
+){
 
-    if(
-      event.key === "ArrowRight" ||
-      event.key.toLowerCase() === "d"
-    ){
+steering=1;
 
-      direction = 1;
+}
 
-    }
+if(
+e.code==="Space"
+){
 
+boosting=true;
 
-    if(
-      event.code === "Space"
-    ){
+}
 
-      boosting = true;
-
-    }
-
-  }
+}
 );
 
 
 window.addEventListener(
-  "keyup",
-  event => {
+"keyup",
+e=>{
 
-    if(
-      event.key === "ArrowLeft" ||
-      event.key === "ArrowRight" ||
-      event.key.toLowerCase() === "a" ||
-      event.key.toLowerCase() === "d"
-    ){
+if(
+[
+"ArrowLeft",
+"ArrowRight",
+"a",
+"d"
+].includes(e.key)
+){
 
-      direction = 0;
+steering=0;
 
-    }
+}
 
+if(
+e.code==="Space"
+){
 
-    if(
-      event.code === "Space"
-    ){
+boosting=false;
 
-      boosting = false;
+}
 
-    }
-
-  }
+}
 );
 
 
-/* SWIPE CONTROL */
+/* TAP TO RESTART */
 
-let startX = 0;
+document
+.getElementById("game")
+.addEventListener(
+"pointerdown",
+()=>{
 
-$("game").addEventListener(
-  "touchstart",
-  event => {
+if(gameOver){
 
-    if(ended){
+location.reload();
 
-      restartGame();
+}
 
-      return;
-
-    }
-
-    if(
-      event.touches[0]
-    ){
-
-      startX =
-        event.touches[0].clientX;
-
-    }
-
-  },
-  {passive:true}
+}
 );
 
 
-$("game").addEventListener(
-  "touchmove",
-  event => {
+/* =========================
+   GAME UPDATE
+========================= */
 
-    if(
-      ended ||
-      !event.touches[0]
-    ){
+function update(dt){
 
-      return;
-
-    }
-
-    const dx =
-      event.touches[0].clientX -
-      startX;
+if(gameOver)
+return;
 
 
-    if(
-      Math.abs(dx) > 10
-    ){
+const multiplier =
+boosting && nitro>0
+? 1.9
+: 1;
 
-      direction =
-        dx > 0
-        ? 1
-        : -1;
 
-      startX =
-        event.touches[0].clientX;
+/* NITRO */
 
-    }
+if(
+boosting &&
+nitro>0
+){
 
-  },
-  {passive:true}
+nitro -=
+42*dt;
+
+}else{
+
+nitro =
+Math.min(
+  100,
+  nitro+7*dt
+);
+
+}
+
+
+/* BIKE STEERING */
+
+bike.position.x +=
+steering*6.2*dt;
+
+bike.position.x =
+THREE.MathUtils.clamp(
+  bike.position.x,
+  -4.1,
+  4.1
 );
 
 
-$("game").addEventListener(
-  "touchend",
-  () => {
+/* LEAN */
 
-    direction = 0;
-
-  },
-  {passive:true}
+bike.rotation.z =
+THREE.MathUtils.lerp(
+  bike.rotation.z,
+  -steering*.12,
+  .12
 );
 
 
-/* START */
+/* SCORE */
 
-createObject("car");
+score +=
+dt*20*multiplier;
 
-createObject("coin");
 
-createObject("coin");
+/* TRAFFIC */
+
+for(
+const car of traffic
+){
+
+car.z +=
+dt*
+(
+  car.speed+
+  16*multiplier
+);
+
+car.object.position.z =
+car.z;
+
+
+if(
+car.z>12
+){
+
+car.z =
+-240-
+Math.random()*120;
+
+car.lane =
+[-1,-.35,.35,1]
+[
+ Math.floor(
+  Math.random()*4
+ )
+];
+
+car.object.position.x =
+car.lane*3;
+
+}
+
+
+/* COLLISION */
+
+const dx =
+Math.abs(
+  car.object.position.x -
+  bike.position.x
+);
+
+const dz =
+Math.abs(
+  car.object.position.z -
+  bike.position.z
+);
+
+
+if(
+dx<1.25 &&
+dz<1.65
+){
+
+lives--;
+
+score =
+Math.max(
+  0,
+  score-100
+);
+
+car.z=-250;
+
+if(
+lives<=0
+){
+
+finish();
+
+}
+
+}
+
+}
+
+
+/* COINS */
+
+for(
+const coin of coins3D
+){
+
+coin.position.z +=
+dt*28*multiplier;
+
+coin.rotation.y +=
+dt*4;
+
+
+if(
+coin.position.z>10
+){
+
+coin.position.z =
+-220-
+Math.random()*80;
+
+coin.position.x =
+(
+ Math.floor(
+  Math.random()*3
+ )-1
+)*2.2;
+
+}
+
+
+if(
+coin.position.distanceTo(
+  bike.position
+)<1.7
+){
+
+coinCount++;
+
+score+=100;
+
+nitro =
+Math.min(
+  100,
+  nitro+10
+);
+
+coin.position.z =
+-220-
+Math.random()*80;
+
+}
+
+}
+
+
+/* CAMERA */
+
+camera.position.x =
+THREE.MathUtils.lerp(
+  camera.position.x,
+  bike.position.x*.42,
+  .08
+);
+
+camera.lookAt(
+  bike.position.x*.35,
+  1,
+  -18
+);
+
+
+/* BEST */
+
+best=Math.max(
+  best,
+  Math.floor(score)
+);
+
+updateHUD();
+
+}
+
+
+/* =========================
+   LOOP
+========================= */
+
+function loop(now){
+
+const dt =
+Math.min(
+  .035,
+  (now-last)/1000
+);
+
+last=now;
+
+update(dt);
+
+renderer.render(
+  scene,
+  camera
+);
+
+requestAnimationFrame(
+  loop
+);
+
+}
+
+
+/* RESIZE */
+
+window.addEventListener(
+"resize",
+()=>{
+
+camera.aspect =
+innerWidth/innerHeight;
+
+camera.updateProjectionMatrix();
+
+renderer.setSize(
+  innerWidth,
+  innerHeight
+);
+
+}
+);
+
 
 updateHUD();
 
 requestAnimationFrame(
-  gameLoop
+loop
 );
 
 })();
