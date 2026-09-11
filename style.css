@@ -1,1 +1,684 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+}
 
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+  background: #4caf50;
+}
+
+#game {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* SKY */
+
+.sky {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      #55c8f5 0%,
+      #9de0f5 42%,
+      #58b957 42%,
+      #58b957 100%
+    );
+}
+
+.sun {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #ffe477;
+  top: 70px;
+  left: 12%;
+  box-shadow: 0 0 35px #fff4a0;
+}
+
+/* HUD */
+
+#hud {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: min(94vw, 620px);
+
+  display: flex;
+  justify-content: space-between;
+
+  color: white;
+  font-size: 19px;
+  font-weight: bold;
+
+  text-shadow: 2px 2px 4px black;
+
+  z-index: 100;
+}
+
+/* WORLD */
+
+#world {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* ROAD */
+
+#road {
+  position: absolute;
+
+  left: 50%;
+  top: -10%;
+
+  width: min(72vw, 570px);
+  height: 120%;
+
+  transform: translateX(-50%);
+
+  background:
+    linear-gradient(
+      90deg,
+      #252525,
+      #424242 8%,
+      #444 50%,
+      #424242 92%,
+      #252525
+    );
+
+  border-left: 10px solid white;
+  border-right: 10px solid white;
+
+  overflow: hidden;
+}
+
+/* ROAD EDGE */
+
+#road::before,
+#road::after {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+
+  width: 8px;
+  height: 100%;
+
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      white 0px,
+      white 28px,
+      #e5222a 28px,
+      #e5222a 56px
+    );
+}
+
+#road::before {
+  left: -2px;
+}
+
+#road::after {
+  right: -2px;
+}
+
+/* LANE LINES */
+
+.lane-line {
+  position: absolute;
+
+  top: -20%;
+
+  width: 8px;
+  height: 140%;
+
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 80px,
+      white 80px,
+      white 140px,
+      transparent 140px,
+      transparent 230px
+    );
+
+  animation: roadMove 0.7s linear infinite;
+}
+
+.line1 {
+  left: 33.33%;
+}
+
+.line2 {
+  left: 66.66%;
+}
+
+@keyframes roadMove {
+
+  from {
+    background-position: 0 0;
+  }
+
+  to {
+    background-position: 0 230px;
+  }
+
+}
+
+/* SIDE GREEN */
+
+#world::before,
+#world::after {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+
+  width: 14vw;
+  height: 100%;
+
+  background:
+    repeating-linear-gradient(
+      0deg,
+      #3cae43 0px,
+      #3cae43 45px,
+      #54bd55 45px,
+      #54bd55 100px
+    );
+
+  z-index: 1;
+}
+
+#world::before {
+  left: 0;
+}
+
+#world::after {
+  right: 0;
+}
+
+/* BIKE */
+
+#bike {
+
+  position: absolute;
+
+  width: 68px;
+  height: 125px;
+
+  left: 50%;
+  bottom: 105px;
+
+  transform: translateX(-50%);
+
+  z-index: 50;
+
+  transition: left 0.13s ease;
+}
+
+/* WHEELS */
+
+.wheel {
+  position: absolute;
+
+  left: 24px;
+
+  width: 20px;
+  height: 42px;
+
+  border-radius: 50%;
+
+  background:
+    linear-gradient(
+      90deg,
+      #050505,
+      #666,
+      #050505
+    );
+
+  border: 2px solid #111;
+}
+
+.front {
+  top: 0;
+}
+
+.back {
+  bottom: 0;
+}
+
+/* HANDLE */
+
+.handle {
+  position: absolute;
+
+  left: 10px;
+  top: 29px;
+
+  width: 48px;
+  height: 6px;
+
+  background: #111;
+
+  border-radius: 5px;
+}
+
+/* RIDER */
+
+.rider {
+  position: absolute;
+
+  left: 21px;
+  top: 16px;
+
+  width: 26px;
+  height: 31px;
+
+  border-radius: 50% 50% 35% 35%;
+
+  background: #181818;
+}
+
+/* HELMET */
+
+.helmet {
+  position: absolute;
+
+  left: 21px;
+  top: 4px;
+
+  width: 25px;
+  height: 23px;
+
+  border-radius: 50%;
+
+  background: #111;
+
+  border: 3px solid #777;
+}
+
+/* SEAT */
+
+.seat {
+  position: absolute;
+
+  left: 18px;
+  top: 33px;
+
+  width: 32px;
+  height: 10px;
+
+  border-radius: 8px;
+
+  background: #111;
+}
+
+/* BODY */
+
+.body {
+  position: absolute;
+
+  left: 17px;
+  top: 42px;
+
+  width: 35px;
+  height: 58px;
+
+  border-radius: 14px 14px 9px 9px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #800000,
+      #ff2929,
+      #850000
+    );
+
+  box-shadow: 0 3px 7px black;
+}
+
+/* TANK */
+
+.tank {
+  position: absolute;
+
+  left: 13px;
+  top: 39px;
+
+  width: 43px;
+  height: 22px;
+
+  border-radius: 15px 15px 7px 7px;
+
+  background: #e51d22;
+}
+
+/* LIGHT */
+
+.light {
+  position: absolute;
+
+  left: 29px;
+  top: 1px;
+
+  width: 9px;
+  height: 9px;
+
+  border-radius: 50%;
+
+  background: white;
+
+  box-shadow: 0 0 10px white;
+}
+
+/* TREES */
+
+.tree {
+  position: absolute;
+
+  font-size: 45px;
+
+  z-index: 10;
+
+  filter: drop-shadow(2px 3px 2px #333);
+
+  animation: treeMove 2s linear infinite;
+}
+
+@keyframes treeMove {
+
+  from {
+    transform: translateY(-150px) scale(0.6);
+  }
+
+  to {
+    transform: translateY(110vh) scale(1.2);
+  }
+
+}
+
+/* ENEMY CAR */
+
+.enemy {
+  position: absolute;
+
+  width: 64px;
+  height: 92px;
+
+  top: -150px;
+
+  transform: translateX(-50%);
+
+  border-radius: 14px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #800000,
+      #ff3030,
+      #850000
+    );
+
+  box-shadow:
+    0 5px 12px #111,
+    inset 0 0 0 3px #222;
+
+  z-index: 40;
+}
+
+.enemy.blue {
+  background:
+    linear-gradient(
+      90deg,
+      #034b98,
+      #168cff,
+      #034b98
+    );
+}
+
+.enemy.yellow {
+  background:
+    linear-gradient(
+      90deg,
+      #a06b00,
+      #ffd21c,
+      #a06b00
+    );
+}
+
+.window {
+  position: absolute;
+
+  top: 10px;
+  left: 10px;
+
+  width: 44px;
+  height: 28px;
+
+  border-radius: 7px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #e9fbff,
+      #477887
+    );
+
+  border: 2px solid #111;
+}
+
+.hl {
+  position: absolute;
+
+  bottom: 9px;
+
+  width: 11px;
+  height: 8px;
+
+  border-radius: 4px;
+
+  background: #ffe900;
+}
+
+.hl.a {
+  left: 8px;
+}
+
+.hl.b {
+  right: 8px;
+}
+
+/* COINS */
+
+.coin {
+  position: absolute;
+
+  top: -150px;
+
+  font-size: 32px;
+
+  transform: translateX(-50%);
+
+  z-index: 40;
+
+  filter: drop-shadow(0 2px 3px #222);
+
+  animation: coinSpin 0.45s linear infinite;
+}
+
+@keyframes coinSpin {
+
+  50% {
+    transform:
+      translateX(-50%)
+      rotateY(180deg);
+  }
+
+}
+
+/* SPEED */
+
+#speed {
+
+  position: absolute;
+
+  right: 12px;
+  bottom: 108px;
+
+  color: white;
+
+  font-size: 18px;
+  font-weight: bold;
+
+  text-shadow: 2px 2px 3px black;
+
+  z-index: 100;
+}
+
+/* NITRO */
+
+#nitro {
+
+  position: absolute;
+
+  right: 10px;
+  bottom: 150px;
+
+  padding: 11px 14px;
+
+  border: 0;
+
+  border-radius: 12px;
+
+  background: #ff5a00;
+
+  color: white;
+
+  font-weight: bold;
+
+  box-shadow: 0 3px 8px black;
+
+  z-index: 100;
+}
+
+/* CONTROLS */
+
+#controls {
+
+  position: absolute;
+
+  bottom: 10px;
+
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  width: min(72vw, 570px);
+
+  display: flex;
+
+  justify-content: space-between;
+
+  padding: 0 14px;
+
+  z-index: 100;
+}
+
+#controls button {
+
+  width: 82px;
+  height: 62px;
+
+  border: 0;
+
+  border-radius: 18px;
+
+  background: rgba(0,0,0,0.82);
+
+  color: white;
+
+  font-size: 32px;
+
+  touch-action: manipulation;
+}
+
+/* GAME OVER */
+
+#gameOver {
+
+  display: none;
+
+  position: absolute;
+
+  top: 50%;
+  left: 50%;
+
+  transform: translate(-50%,-50%);
+
+  width: 85%;
+  max-width: 390px;
+
+  padding: 30px;
+
+  text-align: center;
+
+  color: white;
+
+  background: rgba(0,0,0,0.95);
+
+  border-radius: 25px;
+
+  z-index: 300;
+}
+
+#gameOver h1 {
+
+  color: #ff3030;
+
+  font-size: 40px;
+
+  margin-bottom: 15px;
+}
+
+#gameOver p {
+
+  font-size: 20px;
+
+  margin: 8px;
+}
+
+#restart {
+
+  margin-top: 18px;
+
+  padding: 13px 24px;
+
+  border: 0;
+
+  border-radius: 12px;
+
+  background: #00c853;
+
+  color: white;
+
+  font-size: 18px;
+
+  font-weight: bold;
+}
